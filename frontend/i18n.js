@@ -1,5 +1,10 @@
 const translations = {
     en: {
+        reg_headless: "Headless",
+        reg_debug: "Debug",
+        kpi_0_success: "0 success",
+        kpi_nodes_connected: "Connected",
+
         step_open_gpt: "Open GPT",
         step_input_acc: "Input Acc",
         step_wait_code: "Wait Code",
@@ -129,6 +134,11 @@ const translations = {
         set_proxies: "Proxy Pool"
     },
     vi: {
+        reg_headless: "Chạy ẩn",
+        reg_debug: "Gỡ lỗi",
+        kpi_0_success: "0 thành công",
+        kpi_nodes_connected: "Đã kết nối",
+
         step_open_gpt: "Mở GPT",
         step_input_acc: "Nhập TK",
         step_wait_code: "Đợi Code",
