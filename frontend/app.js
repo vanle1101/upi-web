@@ -343,7 +343,11 @@
       ...(token ? { 'X-API-Token': token } : {}),
       ...(opts.headers || {}),
     };
-    return fetch(path, {
+    let url = path;
+    if (window.API_BASE_URL && path.startsWith('/')) {
+      url = window.API_BASE_URL + path;
+    }
+    return fetch(url, {
       ...opts,
       headers,
     }).then((r) => {
