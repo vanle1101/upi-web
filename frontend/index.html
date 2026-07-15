@@ -128,10 +128,10 @@
       <p data-i18n="reg_desc">Prepare identities, monitor browser work and review MFA results from one queue.</p>
     </div>
     <div class="pipeline-strip" aria-label="Registration pipeline">
-      <span class="pipeline-step is-current">Mở GPT</span>
-      <span class="pipeline-step">Nhập TK</span>
-      <span class="pipeline-step">Đợi Code</span>
-      <span class="pipeline-step">Pass</span>
+      <span class="pipeline-step is-current"> data-i18n="step_open_gpt">Mở GPT</span>
+      <span class="pipeline-step"> data-i18n="step_input_acc">Nhập TK</span>
+      <span class="pipeline-step"> data-i18n="step_wait_code">Đợi Code</span>
+      <span class="pipeline-step"> data-i18n="step_pass">Pass</span>
       <span class="pipeline-step">2FA</span>
     </div>
   </header>
@@ -139,21 +139,21 @@
   <section class="metric-strip" aria-label="Registration overview">
     <article class="metric-card metric-green">
       <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Total jobs</span>
+      <span class="metric-label"> data-i18n="kpi_total_jobs">Total jobs</span>
       <strong id="metric-total-jobs">0</strong>
-      <small id="metric-total-note">Current queue</small>
+      <small id="metric-total-note"> data-i18n="kpi_current_queue">Current queue</small>
       <div class="metric-sparkline ops-realtime-chart" id="reg-total-jobs-chart" aria-hidden="true"></div>
     </article>
     <article class="metric-card metric-green">
       <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Success rate</span>
+      <span class="metric-label"> data-i18n="kpi_success_rate">Success rate</span>
       <strong id="metric-success-rate">0%</strong>
       <small id="metric-success-note">0 success</small>
       <span class="metric-ring" aria-hidden="true"></span>
     </article>
     <article class="metric-card metric-blue">
       <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Active runs</span>
+      <span class="metric-label"> data-i18n="kpi_active_runs">Active runs</span>
       <strong id="metric-active-runs">0</strong>
       <small id="metric-active-note">In progress</small>
       <div class="metric-sparkline ops-realtime-chart" id="reg-active-runs-chart" aria-hidden="true"></div>
@@ -190,8 +190,8 @@
       <label class="input-group config-field-mode">
         <span class="input-label" data-i18n="reg_reg_mode">Reg Mode</span>
         <select id="reg-mode-select">
-          <option value="browser">Browser (anti-detect)</option>
-          <option value="pure_request">Pure Request (HTTP only)</option>
+          <option value="browser"> data-i18n="reg_mode_browser">Browser (anti-detect)</option>
+          <option value="pure_request"> data-i18n="reg_mode_pure">Pure Request (HTTP only)</option>
         </select>
       </label>
       <div id="mail-mode-config-host" class="mail-mode-config-host"></div>
@@ -293,7 +293,7 @@
     <aside class="insights-rail ops-live-rail" aria-label="Registration insights">
       <section class="insight-card live-overview-card">
         <header class="live-overview-head">
-          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span>Live Overview</span>
+          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span data-i18n="rail_live_overview">Live Overview</span>
           <span class="live-badge">Live</span>
         </header>
         <div class="live-overview-stats">
@@ -308,12 +308,12 @@
         <div class="live-chart ops-realtime-chart rail-live-chart" id="reg-realtime-chart" data-chart-value-id="insight-jobs-min" aria-label="Realtime registration throughput chart"></div>
         <div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
         <div class="rail-block health-card">
-          <header class="rail-block-head">System Health</header>
-          <div class="health-row"><span>Cluster Node</span><strong>Online</strong></div>
-          <div class="health-row"><span>Proxy Pool</span><strong style="color:var(--brand-primary)">184/185 Active</strong></div>
-          <div class="health-row"><span>Uplink Speed</span><strong>2.4 Gbps</strong></div>
+          <header class="rail-block-head"> data-i18n="rail_system_health">System Health</header>
+          <div class="health-row"><span> data-i18n="rail_cluster_node">Cluster Node</span><strong>Online</strong></div>
+          <div class="health-row"><span> data-i18n="rail_proxy_pool">Proxy Pool</span><strong style="color:var(--brand-primary)">184/185 Active</strong></div>
+          <div class="health-row"><span> data-i18n="rail_uplink_speed">Uplink Speed</span><strong>2.4 Gbps</strong></div>
           <div class="health-row"><span>API Latency</span><strong>12ms</strong></div>
-          <div class="health-row"><span>Database Sync</span><strong>Syncing</strong></div>
+          <div class="health-row"><span> data-i18n="rail_database_sync">Database Sync</span><strong>Syncing</strong></div>
         </div>
 
         <span class="rail-hidden-metric" id="insight-jobs-min">0.0</span>
@@ -412,7 +412,7 @@
     <aside class="insights-rail tab-chart-rail ops-live-rail" aria-label="Session insights">
       <section class="insight-card live-overview-card">
         <header class="live-overview-head">
-          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span>Live Overview</span>
+          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span data-i18n="rail_live_overview">Live Overview</span>
           <span class="live-badge">Live</span>
         </header>
         <div class="live-overview-stats">
@@ -427,12 +427,12 @@
         <div class="live-chart ops-realtime-chart rail-live-chart" id="session-realtime-chart" data-chart-value-id="session-chart-value" aria-label="Realtime session success chart"></div>
         <div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
         <div class="rail-block health-card">
-          <header class="rail-block-head">System Health</header>
-          <div class="health-row"><span>Auth Cluster</span><strong>Online</strong></div>
-          <div class="health-row"><span>Cloud Browser</span><strong>Provisioned</strong></div>
-          <div class="health-row"><span>API Gateway</span><strong>99.9% Uptime</strong></div>
-          <div class="health-row"><span>Encryption</span><strong>Active</strong></div>
-          <div class="health-row"><span>Edge Cache</span><strong>HIT</strong></div>
+          <header class="rail-block-head"> data-i18n="rail_system_health">System Health</header>
+          <div class="health-row"><span> data-i18n="rail_auth_cluster">Auth Cluster</span><strong>Online</strong></div>
+          <div class="health-row"><span> data-i18n="rail_cloud_browser">Cloud Browser</span><strong>Provisioned</strong></div>
+          <div class="health-row"><span> data-i18n="rail_api_gateway">API Gateway</span><strong>99.9% Uptime</strong></div>
+          <div class="health-row"><span> data-i18n="rail_encryption">Encryption</span><strong>Active</strong></div>
+          <div class="health-row"><span> data-i18n="rail_edge_cache">Edge Cache</span><strong>HIT</strong></div>
         </div>
 
         <span class="rail-hidden-metric" id="session-chart-value">0%</span>
@@ -461,21 +461,21 @@
   <section class="metric-strip upi-metric-strip" aria-label="UPI overview">
     <article class="metric-card metric-green">
       <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Total jobs</span>
+      <span class="metric-label"> data-i18n="kpi_total_jobs">Total jobs</span>
       <strong id="upi-metric-total-jobs">0</strong>
-      <small id="upi-metric-total-note">Current queue</small>
+      <small id="upi-metric-total-note"> data-i18n="kpi_current_queue">Current queue</small>
       <div class="metric-sparkline ops-realtime-chart" id="upi-total-jobs-chart" aria-hidden="true"></div>
     </article>
     <article class="metric-card metric-green">
       <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Success rate</span>
+      <span class="metric-label"> data-i18n="kpi_success_rate">Success rate</span>
       <strong id="upi-metric-success-rate">0%</strong>
       <small id="upi-metric-success-note">0 success</small>
       <span class="metric-ring" aria-hidden="true"></span>
     </article>
     <article class="metric-card metric-blue">
       <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Active runs</span>
+      <span class="metric-label"> data-i18n="kpi_active_runs">Active runs</span>
       <strong id="upi-metric-active-runs">0</strong>
       <small id="upi-metric-active-note">In progress</small>
       <div class="metric-sparkline ops-realtime-chart" id="upi-active-runs-chart" aria-hidden="true"></div>
@@ -628,7 +628,7 @@
     <aside class="insights-rail tab-chart-rail ops-live-rail" aria-label="UPI insights">
       <section class="insight-card live-overview-card">
         <header class="live-overview-head">
-          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span>Live Overview</span>
+          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span data-i18n="rail_live_overview">Live Overview</span>
           <span class="live-badge">Live</span>
         </header>
         <div class="live-overview-stats">
@@ -643,12 +643,12 @@
         <div class="live-chart ops-realtime-chart rail-live-chart" id="upi-realtime-chart" data-chart-value-id="upi-chart-value" aria-label="Realtime UPI success chart"></div>
         <div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
         <div class="rail-block health-card">
-          <header class="rail-block-head">System Health</header>
+          <header class="rail-block-head"> data-i18n="rail_system_health">System Health</header>
           <div class="health-row"><span>Payment Gateway</span><strong>Online</strong></div>
-          <div class="health-row"><span>Proxy Pool</span><strong style="color:var(--brand-primary)">184/185 Active</strong></div>
+          <div class="health-row"><span> data-i18n="rail_proxy_pool">Proxy Pool</span><strong style="color:var(--brand-primary)">184/185 Active</strong></div>
           <div class="health-row"><span>SSL Certificate</span><strong>Valid</strong></div>
           <div class="health-row"><span>Telegram Bot</span><strong>Connected</strong></div>
-          <div class="health-row"><span>Database Sync</span><strong>Syncing</strong></div>
+          <div class="health-row"><span> data-i18n="rail_database_sync">Database Sync</span><strong>Syncing</strong></div>
         </div>
 
         <span class="rail-hidden-metric" id="upi-chart-value">0%</span>
@@ -704,7 +704,7 @@
     <aside class="insights-rail tab-chart-rail ops-live-rail" aria-label="Get Account insights">
       <section class="insight-card live-overview-card">
         <header class="live-overview-head">
-          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span>Live Overview</span>
+          <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span data-i18n="rail_live_overview">Live Overview</span>
           <span class="live-badge">Live</span>
         </header>
         <div class="live-overview-stats">
@@ -719,12 +719,12 @@
         <div class="live-chart ops-realtime-chart rail-live-chart" id="getacc-realtime-chart" data-chart-value-id="getacc-chart-value" aria-label="Realtime extraction chart"></div>
         <div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
         <div class="rail-block health-card">
-          <header class="rail-block-head">System Health</header>
+          <header class="rail-block-head"> data-i18n="rail_system_health">System Health</header>
           <div class="health-row"><span>Extraction Engine</span><strong>Online</strong></div>
-          <div class="health-row"><span>Worker Nodes</span><strong style="color:var(--brand-primary)">4/4 Active</strong></div>
+          <div class="health-row"><span> data-i18n="kpi_worker_nodes">Worker Nodes</span><strong style="color:var(--brand-primary)">4/4 Active</strong></div>
           <div class="health-row"><span>Datacenter</span><strong>99.9% Uptime</strong></div>
-          <div class="health-row"><span>API Gateway</span><strong>Online</strong></div>
-          <div class="health-row"><span>Secure Storage</span><strong>Encrypted</strong></div>
+          <div class="health-row"><span> data-i18n="rail_api_gateway">API Gateway</span><strong>Online</strong></div>
+          <div class="health-row"><span> data-i18n="rail_secure_storage">Secure Storage</span><strong>Encrypted</strong></div>
         </div>
 
         <span class="rail-hidden-metric" id="getacc-chart-value">0%</span>
