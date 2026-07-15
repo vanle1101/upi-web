@@ -8,24 +8,7 @@
 <meta name="auth-token" content="__AUTH_TOKEN__" />
 <link rel="stylesheet" href="style.css" />
 <link rel="stylesheet" href="workspace.css" />
-<script src="/config.js"></script>
-<script>
-  const originalFetch = window.fetch;
-  window.fetch = function() {
-    if (typeof arguments[0] === 'string' && arguments[0].startsWith('/')) {
-      arguments[0] = (window.API_BASE_URL || '') + arguments[0];
-    }
-    return originalFetch.apply(this, arguments);
-  };
-
-  const OriginalEventSource = window.EventSource;
-  window.EventSource = function(url, config) {
-    if (typeof url === 'string' && url.startsWith('/')) {
-      url = (window.API_BASE_URL || '') + url;
-    }
-    return new OriginalEventSource(url, config);
-  };
-</script>
+</head>
 <body>
 <a class="skip-link" href="#tab-reg">Skip to workspace</a>
 <header class="topbar">
