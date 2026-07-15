@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Operations Console</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/operations.css" />
-<link rel="stylesheet" href="/static/layout-theme.css" />
+<link rel="stylesheet" href="./operations.css" />
+<link rel="stylesheet" href="./layout-theme.css" />
 </head>
 <body>
 
@@ -615,5 +615,27 @@ http://user2:pass2@host2:port2" spellcheck="false"></textarea>
 </footer>
 </div>
 </div>
+<script>
+  (() => {
+    try {
+      const theme = localStorage.getItem('gpt_console.theme') || 'light';
+      if (theme === 'dark') document.body.classList.add('dark-theme');
+    } catch (_) {
+      document.body.classList.add('dark-theme');
+    }
+  })();
+</script>
+<script src="./dialog.js?v=__ASSET_VERSION__"></script>
+<script src="./settings.js?v=__ASSET_VERSION__"></script>
+<script src="./app.js?v=__ASSET_VERSION__"></script>
+<script src="./session.js?v=__ASSET_VERSION__"></script>
+<script src="./link.js?v=__ASSET_VERSION__"></script>
+<script src="./hme.js?v=__ASSET_VERSION__"></script>
+<script src="./autoreg.js?v=__ASSET_VERSION__"></script>
+<script src="./upi.js?v=__ASSET_VERSION__"></script>
+<script src="./settings_panel.js?v=__ASSET_VERSION__"></script>
+<script src="./workspace.js?v=__ASSET_VERSION__"></script>
+<script src="./getacc.js?v=__ASSET_VERSION__"></script>
+<script src="./mac_select.js?v=__ASSET_VERSION__"></script>
 </body>
 </html>
