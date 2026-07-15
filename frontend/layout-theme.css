@@ -857,3 +857,8 @@ body:not(.dark-theme) .sidebar-nav-item.active {
 .topbar { display: none !important; }
 .skip-link { display: none !important; }
 
+
+.sidebar, .sidebar-nav-item, .dock-tab, .form-switch {
+  pointer-events: auto !important;
+  position: relative;
+}

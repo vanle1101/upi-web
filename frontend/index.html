@@ -126,11 +126,25 @@
   </aside>
   <div class="main">
     <header class="app-header">
+      
       <div class="header-toggles">
-        <label class="toggle-switch"><span class="toggle-label">Runtime</span><input type="checkbox" id="global-runtime-toggle" checked><span class="toggle-slider"></span></label>
-        <label class="toggle-switch"><span class="toggle-label">Headless</span><input type="checkbox" id="headless-toggle" checked><span class="toggle-slider"></span></label>
-        <label class="toggle-switch"><span class="toggle-label">Debug</span><input type="checkbox" id="debug-toggle"><span class="toggle-slider"></span></label>
+        <label class="form-switch" title="Global Runtime">
+          <input type="checkbox" id="global-runtime-toggle" checked />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Runtime</span>
+        </label>
+        <label class="form-switch" title="Run browser in background">
+          <input type="checkbox" id="headless-toggle" checked />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Headless</span>
+        </label>
+        <label class="form-switch" title="Debug mode">
+          <input type="checkbox" id="debug-toggle" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Debug</span>
+        </label>
       </div>
+
     </header>
 <main class="tab-content ops-workspace ops-reg active" id="tab-reg">
   <div class="dashboard-content">
@@ -160,7 +174,7 @@
         <div class="kpi-info">
           <span class="kpi-label">TOTAL JOBS</span>
           <span class="kpi-value" id="metric-total-jobs">0</span>
-          <span class="kpi-sub">Current queue</span>
+          <span class="kpi-sub" id="metric-total-note">Current queue</span>
         </div>
       </div>
       <div class="kpi-card-new">
@@ -168,7 +182,7 @@
         <div class="kpi-info">
           <span class="kpi-label">SUCCESS RATE</span>
           <span class="kpi-value" id="metric-success-rate">0%</span>
-          <span class="kpi-sub"><span id="metric-success-count">0</span> success</span>
+          <span class="kpi-sub" id="metric-success-note"><span id="metric-success-count">0</span> success</span>
         </div>
       </div>
       <div class="kpi-card-new">
@@ -176,7 +190,7 @@
         <div class="kpi-info">
           <span class="kpi-label">ACTIVE RUNS</span>
           <span class="kpi-value" id="metric-active-runs">0</span>
-          <span class="kpi-sub">In progress</span>
+          <span class="kpi-sub" id="metric-active-note">In progress</span>
         </div>
       </div>
       <div class="kpi-card-new">
@@ -184,7 +198,7 @@
         <div class="kpi-info">
           <span class="kpi-label">AVG TIME / JOB</span>
           <span class="kpi-value" id="metric-avg-time">-</span>
-          <span class="kpi-sub">No duration yet</span>
+          <span class="kpi-sub" id="metric-avg-note">No duration yet</span>
         </div>
       </div>
       <div class="kpi-card-new">
@@ -192,7 +206,7 @@
         <div class="kpi-info">
           <span class="kpi-label">ERROR RATE</span>
           <span class="kpi-value" id="metric-error-rate">0%</span>
-          <span class="kpi-sub"><span id="metric-error-count">0</span> failed</span>
+          <span class="kpi-sub" id="metric-error-note"><span id="metric-error-count">0</span> failed</span>
         </div>
       </div>
     </div>
