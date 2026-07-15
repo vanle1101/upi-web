@@ -4321,3 +4321,8 @@ body.dark-theme {
     display: none !important;
   }
 }
+
+/* Make UI elements unselectable like a native app */
+h1, h2, h3, h4, header, .ops-rail, .control-rail, .insights-rail, .ops-live-rail, .rail-block, .kpi-card, .kpi-grid, .ops-kpi-grid, .insight-card, .ops-stepper, .workflow-steps, .btn, button, .workspace-mast, .live-overview-card, .stat-card { user-select: none; -webkit-user-select: none; }
+
+.metric-card, .pipeline-strip, .pipeline-step, .workspace-title-group, .health-row, .live-overview-stats, .rail-block-head, .rail-chart-head, .rail-chart-foot, .live-overview-title { user-select: none; -webkit-user-select: none; }
