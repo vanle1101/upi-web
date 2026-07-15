@@ -70,35 +70,35 @@
       </div>
     </div>
     <nav class="sidebar-nav">
-    <button class="sidebar-nav-item tab-btn active" data-tab="reg" aria-label="Reg">
+    <button class="sidebar-nav-item active" data-tab="reg" aria-label="Reg">
       <span class="sidebar-nav-icon"></span>
       <span class="sidebar-nav-text">
         <span class="sidebar-nav-title">Reg</span>
         <span class="sidebar-nav-subtitle">Provision accounts</span>
       </span>
     </button>
-    <button class="sidebar-nav-item tab-btn" data-tab="session" aria-label="Get Session">
+    <button class="sidebar-nav-item" data-tab="session" aria-label="Get Session">
       <span class="sidebar-nav-icon"></span>
       <span class="sidebar-nav-text">
         <span class="sidebar-nav-title">Get Session</span>
         <span class="sidebar-nav-subtitle">Capture auth state</span>
       </span>
     </button>
-    <button class="sidebar-nav-item tab-btn" data-tab="upi" aria-label="UPI QR">
+    <button class="sidebar-nav-item" data-tab="upi" aria-label="UPI QR">
       <span class="sidebar-nav-icon"></span>
       <span class="sidebar-nav-text">
         <span class="sidebar-nav-title">UPI QR</span>
         <span class="sidebar-nav-subtitle">Payment issuance</span>
       </span>
     </button>
-    <button class="sidebar-nav-item tab-btn" data-tab="getacc" aria-label="Get Acc">
+    <button class="sidebar-nav-item" data-tab="getacc" aria-label="Get Acc">
       <span class="sidebar-nav-icon"></span>
       <span class="sidebar-nav-text">
         <span class="sidebar-nav-title">Get Acc</span>
         <span class="sidebar-nav-subtitle">Extract credentials</span>
       </span>
     </button>
-    <button class="sidebar-nav-item tab-btn" data-tab="settings" aria-label="Settings">
+    <button class="sidebar-nav-item" data-tab="settings" aria-label="Settings">
       <span class="sidebar-nav-icon"></span>
       <span class="sidebar-nav-text">
         <span class="sidebar-nav-title">Settings</span>
@@ -128,8 +128,8 @@
     <header class="app-header">
       <div class="header-toggles">
         <label class="toggle-switch"><span class="toggle-label">Runtime</span><input type="checkbox" id="global-runtime-toggle" checked><span class="toggle-slider"></span></label>
-        <label class="toggle-switch"><span class="toggle-label">Headless</span><input type="checkbox" id="global-headless-toggle" checked><span class="toggle-slider"></span></label>
-        <label class="toggle-switch"><span class="toggle-label">Debug</span><input type="checkbox" id="global-debug-toggle"><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><span class="toggle-label">Headless</span><input type="checkbox" id="headless-toggle" checked><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><span class="toggle-label">Debug</span><input type="checkbox" id="debug-toggle"><span class="toggle-slider"></span></label>
       </div>
     </header>
 <main class="tab-content ops-workspace ops-reg active" id="tab-reg">
@@ -158,7 +158,7 @@
         <div class="kpi-icon green"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
         <div class="kpi-info">
           <span class="kpi-label">TOTAL JOBS</span>
-          <span class="kpi-value" id="kpi-total">0</span>
+          <span class="kpi-value" id="metric-total-jobs">0</span>
           <span class="kpi-sub">Current queue</span>
         </div>
       </div>
@@ -166,15 +166,15 @@
         <div class="kpi-icon green"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
         <div class="kpi-info">
           <span class="kpi-label">SUCCESS RATE</span>
-          <span class="kpi-value" id="kpi-success-rate">0%</span>
-          <span class="kpi-sub"><span id="kpi-success-count">0</span> success</span>
+          <span class="kpi-value" id="metric-success-rate">0%</span>
+          <span class="kpi-sub"><span id="metric-success-count">0</span> success</span>
         </div>
       </div>
       <div class="kpi-card-new">
         <div class="kpi-icon blue"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
         <div class="kpi-info">
           <span class="kpi-label">ACTIVE RUNS</span>
-          <span class="kpi-value" id="kpi-active">0</span>
+          <span class="kpi-value" id="metric-active-runs">0</span>
           <span class="kpi-sub">In progress</span>
         </div>
       </div>
@@ -182,7 +182,7 @@
         <div class="kpi-icon blue"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
         <div class="kpi-info">
           <span class="kpi-label">AVG TIME / JOB</span>
-          <span class="kpi-value" id="kpi-avg-time">-</span>
+          <span class="kpi-value" id="metric-avg-time">-</span>
           <span class="kpi-sub">No duration yet</span>
         </div>
       </div>
@@ -190,8 +190,8 @@
         <div class="kpi-icon red"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></div>
         <div class="kpi-info">
           <span class="kpi-label">ERROR RATE</span>
-          <span class="kpi-value" id="kpi-error-rate">0%</span>
-          <span class="kpi-sub"><span id="kpi-error-count">0</span> failed</span>
+          <span class="kpi-value" id="metric-error-rate">0%</span>
+          <span class="kpi-sub"><span id="metric-error-count">0</span> failed</span>
         </div>
       </div>
     </div>
@@ -210,6 +210,7 @@
                 <option value="outlook">Hotmail</option>
                 <option value="gmail">Gmail</option>
               </select>
+              <div id="reg-mail-config-host" style="display:flex; flex-direction:column; gap:4px; margin-top:8px;"></div>
             </div>
             <div class="form-group">
               <label class="form-label" for="reg-strategy">Reg Mode</label>
@@ -224,7 +225,7 @@
               Combos
               <span style="color:var(--lt-green);"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:text-bottom;"><polyline points="20 6 9 17 4 12"></polyline></svg> <span id="combo-count">0 combos</span></span>
             </label>
-            <textarea id="reg-combos-input" class="form-input form-textarea" placeholder="email|password"></textarea>
+            <textarea id="combo-input" class="form-input form-textarea" placeholder="email|password"></textarea>
           </div>
         </div>
         <div class="panel-block">
@@ -232,15 +233,15 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="reg-timeout">Timeout (s)</label>
-              <input type="number" id="reg-timeout" class="form-input" value="240">
+              <input type="number" id="job-timeout" class="form-input" value="240">
             </div>
             <div class="form-group">
-              <label class="form-label">Use proxy <label class="toggle-switch" style="float:right;"><input type="checkbox" id="reg-use-proxy" checked><span class="toggle-slider"></span></label></label>
+              <label class="form-label">Use proxy <label class="toggle-switch" style="float:right;"><input type="checkbox" id="proxy-toggle" checked><span class="toggle-slider"></span></label></label>
             </div>
           </div>
           <div class="form-group">
             <label class="form-label" for="reg-default-pass">Mật khẩu mặc định</label>
-            <input type="text" id="reg-default-pass" class="form-input" value="Gsh@2025!pass">
+            <input type="text" id="default-password" class="form-input" value="Gsh@2025!pass">
           </div>
           <div class="actions-row">
             <button id="btn-run" class="btn-primary">Start registration</button>

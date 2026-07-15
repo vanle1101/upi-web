@@ -392,7 +392,7 @@
   function activateTab(tabId) {
     const prevTab = _activeTabId;
     _activeTabId = tabId;
-    document.querySelectorAll('.tab-btn').forEach((btn) => {
+    document.querySelectorAll('.sidebar-nav-item').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.tab === tabId);
     });
     document.querySelectorAll('.tab-content').forEach((tab) => {
@@ -405,12 +405,12 @@
   function initTabs() {
     if (document.body.dataset.tabsBound === 'true') return;
     document.body.dataset.tabsBound = 'true';
-    document.querySelectorAll('.tab-btn').forEach((btn) => {
+    document.querySelectorAll('.sidebar-nav-item').forEach((btn) => {
       btn.addEventListener('click', () => activateTab(btn.dataset.tab));
     });
     // Tab tạm ẩn (chưa dùng được). Mở lại: bỏ khỏi danh sách + bỏ comment nút nav trong index.html.
     const hiddenTabs = ['link', 'hme'];
-    let initialTab = Settings.get('ui.active_tab') || document.querySelector('.tab-btn.active')?.dataset.tab || 'reg';
+    let initialTab = Settings.get('ui.active_tab') || document.querySelector('.sidebar-nav-item.active')?.dataset.tab || 'reg';
     if (hiddenTabs.includes(initialTab)) initialTab = 'reg';
     activateTab(initialTab);
   }
@@ -1129,8 +1129,8 @@
   });
 
   // ── Copy buttons ─────────────────────────────────────────────────
-  dom.btnCopySuccess.addEventListener('click', () => copyText(dom.successPane.textContent));
-  dom.btnCopyError.addEventListener('click', () => copyText(dom.errorPane.textContent));
+  if (dom.btnCopySuccess) dom.btnCopySuccess.addEventListener('click', () => copyText(dom.successPane.textContent));
+  if (dom.btnCopyError) dom.btnCopyError.addEventListener('click', () => copyText(dom.errorPane.textContent));
   if (dom.btnClearLog) {
     dom.btnClearLog.addEventListener('click', () => {
       dom.logPane.textContent = '';
