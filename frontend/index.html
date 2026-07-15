@@ -133,118 +133,123 @@
       </div>
     </header>
 <main class="tab-content ops-workspace ops-reg active" id="tab-reg">
-  <header class="workspace-mast">
-    <div class="workspace-title-group">
-      <span class="workspace-kicker" data-i18n="reg_kicker">Account provisioning</span>
-      <h1 data-i18n="reg_title">Registration desk</h1>
-      <p data-i18n="reg_desc">Prepare identities, monitor browser work and review MFA results from one queue.</p>
-    </div>
-    <div class="pipeline-strip" aria-label="Registration pipeline">
-      <span class="pipeline-step is-current">Mở GPT</span>
-      <span class="pipeline-step" data-i18n="step_input_acc">Nhập TK</span>
-      <span class="pipeline-step" data-i18n="step_wait_code">Đợi Code</span>
-      <span class="pipeline-step" data-i18n="step_pass">Pass</span>
-      <span class="pipeline-step">2FA</span>
-    </div>
-  </header>
-
-  <section class="metric-strip" aria-label="Registration overview">
-    <article class="metric-card metric-green">
-      <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label" data-i18n="kpi_total_jobs">Total jobs</span>
-      <strong id="metric-total-jobs">0</strong>
-      <small id="metric-total-note" data-i18n="kpi_current_queue">Current queue</small>
-      <div class="metric-sparkline ops-realtime-chart" id="reg-total-jobs-chart" aria-hidden="true"></div>
-    </article>
-    <article class="metric-card metric-green">
-      <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label" data-i18n="kpi_success_rate">Success rate</span>
-      <strong id="metric-success-rate">0%</strong>
-      <small id="metric-success-note"><span data-i18n="kpi_0_success">0 success</span></small>
-      <span class="metric-ring" aria-hidden="true"></span>
-    </article>
-    <article class="metric-card metric-blue">
-      <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label" data-i18n="kpi_active_runs">Active runs</span>
-      <strong id="metric-active-runs">0</strong>
-      <small id="metric-active-note" data-i18n="kpi_running">In progress</small>
-      <div class="metric-sparkline ops-realtime-chart" id="reg-active-runs-chart" aria-hidden="true"></div>
-    </article>
-    <article class="metric-card metric-blue">
-      <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Avg time / job</span>
-      <strong id="metric-avg-time">-</strong>
-      <small id="metric-avg-note">No duration yet</small>
-      <div class="metric-sparkline ops-realtime-chart" id="reg-avg-time-chart" aria-hidden="true"></div>
-    </article>
-    <article class="metric-card metric-red">
-      <span class="metric-icon" aria-hidden="true"></span>
-      <span class="metric-label">Error rate</span>
-      <strong id="metric-error-rate">0%</strong>
-      <small id="metric-error-note">0 failed</small>
-      <div class="metric-sparkline ops-realtime-chart" id="reg-error-rate-chart" aria-hidden="true"></div>
-    </article>
-  </section>
-
-  <div class="workspace-grid">
-    <aside class="control-rail">
-  <section class="card card-input control-surface">
-    <header class="card-head">
-      <h2 data-i18n="reg_source_accounts">Source accounts</h2>
-      <span class="muted card-head-note" id="input-hint" data-i18n="reg_input_hint">One combo per line: email|password|refresh_token|client_id</span>
-    </header>
-    <!-- Mail Mode + Worker config: 1 row, label trên / control dưới -->
-    <div class="mail-mode-row">
-      <label class="input-group config-field-mode">
-        <span class="input-label" data-i18n="reg_mail_mode">Mail Mode</span>
-        <select id="mail-mode-select"></select>
-      </label>
-      <label class="input-group config-field-mode">
-        <span class="input-label" data-i18n="reg_reg_mode">Reg Mode</span>
-        <select id="reg-mode-select">
-          <option value="browser" data-i18n="reg_mode_browser">Browser (anti-detect)</option>
-          <option value="pure_request" data-i18n="reg_mode_pure">Pure Request (HTTP only)</option>
-        </select>
-      </label>
-      <div id="mail-mode-config-host" class="mail-mode-config-host"></div>
-    </div>
-    <textarea class="combo-textarea" id="combo-input" placeholder="email1@hotmail.com|pwd1|M.C548...|9e5f94bc-...&#10;email2@outlook.com|pwd2|M.C525...|9e5f94bc-..."></textarea>
-    <div class="card-settings">
-      <div class="card-settings-row card-settings-row-mixed">
-        <label class="input-group config-field-long">
-          <span class="input-label" data-i18n="reg_default_password">Default password</span>
-          <input type="text" id="default-password" placeholder="Leave blank for random" data-i18n-placeholder="reg_default_password" autocomplete="off" spellcheck="false" />
-        </label>
-        <label class="toggle-wrap" title="Bật/tắt áp dụng proxy pool cho Reg jobs. Tắt = chạy direct (no proxy).">
-          <input type="checkbox" id="proxy-toggle" checked />
-          <span class="toggle-track"><span class="toggle-thumb"></span></span>
-          <span class="toggle-label" data-i18n="reg_use_proxy">Proxy</span>
-        </label>
-        <label class="input-group config-field-short">
-          <span class="input-label" data-i18n="reg_timeout">Timeout (s/job)</span>
-          <input type="number" id="job-timeout" value="240" min="30" max="600" step="10" />
-        </label>
+  <div class="workspace-content">
+    <div class="page-header">
+      <div class="page-title-wrap">
+        <span class="page-category">Cấp phát tài khoản</span>
+        <h1 class="page-title" data-i18n="reg_title">Registration Desk</h1>
+        <p class="page-subtitle" data-i18n="reg_desc">Chuẩn bị danh tính, giám sát trình duyệt và duyệt kết quả MFA từ một hàng đợi.</p>
       </div>
-      <div class="workflow-proxy-row">
-        <div class="input-group workflow-proxy-field">
-          <div class="workflow-proxy-heading">
-            <label class="input-label" for="reg-proxy-input">Reg proxy <small>Only for Registration</small></label>
-            <span class="workflow-proxy-note">Use the Proxy switch above to enable</span>
-          </div>
-          <textarea id="reg-proxy-input" class="proxy-textarea" rows="3" placeholder="host:port:user:pass&#10;host2:port:user:pass (blank = direct)" spellcheck="false" autocomplete="off"></textarea>
+      <div class="stepper">
+        <div class="step done"><div class="step-circle">✓</div> Mở GPT</div>
+        <div class="step-connector"></div>
+        <div class="step active"><div class="step-circle">2</div> Nhập TK</div>
+        <div class="step-connector"></div>
+        <div class="step"><div class="step-circle">3</div> Đợi Code</div>
+        <div class="step-connector"></div>
+        <div class="step"><div class="step-circle">4</div> Pass</div>
+        <div class="step-connector"></div>
+        <div class="step"><div class="step-circle">5</div> 2FA</div>
+      </div>
+    </div>
+    
+    <div class="kpi-row">
+      <div class="kpi-card-new">
+        <div class="kpi-icon green"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+        <div class="kpi-info">
+          <span class="kpi-label">TOTAL JOBS</span>
+          <span class="kpi-value" id="kpi-total">0</span>
+          <span class="kpi-sub">Current queue</span>
+        </div>
+      </div>
+      <div class="kpi-card-new">
+        <div class="kpi-icon green"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+        <div class="kpi-info">
+          <span class="kpi-label">SUCCESS RATE</span>
+          <span class="kpi-value" id="kpi-success-rate">0%</span>
+          <span class="kpi-sub"><span id="kpi-success-count">0</span> success</span>
+        </div>
+      </div>
+      <div class="kpi-card-new">
+        <div class="kpi-icon blue"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>
+        <div class="kpi-info">
+          <span class="kpi-label">ACTIVE RUNS</span>
+          <span class="kpi-value" id="kpi-active">0</span>
+          <span class="kpi-sub">In progress</span>
+        </div>
+      </div>
+      <div class="kpi-card-new">
+        <div class="kpi-icon blue"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+        <div class="kpi-info">
+          <span class="kpi-label">AVG TIME / JOB</span>
+          <span class="kpi-value" id="kpi-avg-time">-</span>
+          <span class="kpi-sub">No duration yet</span>
+        </div>
+      </div>
+      <div class="kpi-card-new">
+        <div class="kpi-icon red"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg></div>
+        <div class="kpi-info">
+          <span class="kpi-label">ERROR RATE</span>
+          <span class="kpi-value" id="kpi-error-rate">0%</span>
+          <span class="kpi-sub"><span id="kpi-error-count">0</span> failed</span>
         </div>
       </div>
     </div>
-    <div class="card-actions">
-      <button id="btn-run" class="btn btn-primary" data-i18n="reg_start">Start registration</button>
-      <button id="btn-stop-all" class="btn btn-danger" data-i18n="reg_stop">Stop All</button>
-      <button id="btn-clear-input" class="btn btn-ghost" data-i18n="reg_clear">Clear Input</button>
-      <span class="muted" id="combo-count" data-i18n="reg_combos_count">0 combos</span>
-    </div>
-  </section>
-    </aside>
-
     
+    <div class="main-grid">
+      <div class="form-panel">
+        <div class="panel-block">
+          <div class="panel-header">
+            Tài khoản nguồn
+            <span class="panel-subtitle">One combo per line.</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="reg-mail-mode">Mail Mode</label>
+              <select id="reg-mail-mode" class="form-input">
+                <option value="outlook">Hotmail</option>
+                <option value="gmail">Gmail</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="reg-strategy">Reg Mode</label>
+              <select id="reg-strategy" class="form-input">
+                <option value="headless">Browser</option>
+                <option value="api">API</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="display:flex;justify-content:space-between;">
+              Combos
+              <span style="color:var(--lt-green);"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:text-bottom;"><polyline points="20 6 9 17 4 12"></polyline></svg> <span id="combo-count">0 combos</span></span>
+            </label>
+            <textarea id="reg-combos-input" class="form-input form-textarea" placeholder="email|password"></textarea>
+          </div>
+        </div>
+        <div class="panel-block">
+          <div class="panel-header" style="margin-bottom:12px;">Run configuration</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="reg-timeout">Timeout (s)</label>
+              <input type="number" id="reg-timeout" class="form-input" value="240">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Use proxy <label class="toggle-switch" style="float:right;"><input type="checkbox" id="reg-use-proxy" checked><span class="toggle-slider"></span></label></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-default-pass">Mật khẩu mặc định</label>
+            <input type="text" id="reg-default-pass" class="form-input" value="Gsh@2025!pass">
+          </div>
+          <div class="actions-row">
+            <button id="btn-run" class="btn-primary">Start registration</button>
+            <button id="btn-stop-all" class="btn-outline-danger">Stop all</button>
+            <button id="btn-clear-input" class="btn-ghost">Clear input</button>
+          </div>
+        </div>
+      </div>
+
       <div class="queue-panel">
         <div class="queue-header">
           <div>
@@ -259,7 +264,7 @@
             <button id="btn-retry-failed" class="btn-ghost">Retry Failed</button>
             <button id="btn-clear-done" class="btn-ghost">Clear completed</button>
             <button id="btn-clear-all" class="btn-ghost">Clear All</button>
-            <span class="queue-subtitle" id="job-summary" style="margin:0;margin-left:8px;"><span style="color:var(--lt-green)">● 28 đang chạy</span></span>
+            <span class="queue-subtitle" id="job-summary" style="margin:0;margin-left:8px;"><span style="color:var(--lt-green)">0 total</span></span>
           </div>
         </div>
         <div class="queue-table-head">
@@ -277,43 +282,26 @@
         </div>
       </div>
 
-
-      <section class="diagnostics-dock is-collapsed" data-dock="reg">
-        <header class="dock-bar">
-          <div class="dock-tabs" role="tablist" aria-label="Registration diagnostics">
-            <button class="dock-tab active" type="button" role="tab" aria-selected="true" data-dock-target="reg-log" data-i18n="reg_tab_runtime">Runtime</button>
-            <button class="dock-tab" type="button" role="tab" aria-selected="false" data-dock-target="reg-success" data-i18n="reg_tab_success">Success</button>
-            <button class="dock-tab" type="button" role="tab" aria-selected="false" data-dock-target="reg-error" data-i18n="reg_tab_errors">Errors</button>
+      <div class="log-panel">
+        <div class="log-header">
+          <div class="log-tabs">
+            <div class="log-tab active" data-target="log-pane">Runtime</div>
+            <div class="log-tab" data-target="success-pane">Success</div>
+            <div class="log-tab" data-target="error-pane">Errors</div>
           </div>
-          <div class="dock-context">
-            <span class="dock-target" id="log-target">No job selected</span>
-            <button id="btn-clear-log" class="btn btn-ghost btn-small" data-i18n="clear_log" title="Clear log viewer">Clear log</button>
-            <button class="dock-collapse" type="button" data-dock-collapse data-i18n="show_details" aria-expanded="false">Show details</button>
+          <div class="log-controls">
+            <label class="toggle-switch" style="transform:scale(0.8);transform-origin:right center;"><span class="toggle-label" style="color:var(--lt-text-muted);">Auto scroll</span><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            <button id="btn-clear-log" class="btn-ghost" style="padding:4px 12px;">Clear log</button>
           </div>
-        </header>
-        <div class="dock-panels">
-          <section class="dock-panel active card card-log" role="tabpanel" data-dock-panel="reg-log">
-            <pre id="log-pane" class="log-pane"></pre>
-          </section>
-          <section class="dock-panel card card-success" role="tabpanel" data-dock-panel="reg-success" hidden>
-            <header class="dock-panel-head">
-              <span data-i18n="reg_success_head">Completed account output</span>
-              <button id="btn-copy-success" class="btn btn-ghost btn-small" data-i18n="copy_all">Copy all</button>
-            </header>
-            <pre id="success-pane" class="output-pane">Format: email|password|secret_2fa</pre>
-          </section>
-          <section class="dock-panel card card-error" role="tabpanel" data-dock-panel="reg-error" hidden>
-            <header class="dock-panel-head">
-              <span data-i18n="reg_error_head">Failed account output</span>
-              <button id="btn-copy-error" class="btn btn-ghost btn-small" data-i18n="copy_all">Copy all</button>
-            </header>
-            <pre id="error-pane" class="output-pane">No errors yet.</pre>
-          </section>
         </div>
-      </section>
-    </section>
-
-    <aside class="insights-rail ops-live-rail" aria-label="Registration insights">
+        <div class="log-body">
+          <pre id="log-pane" style="margin:0;font-family:inherit;"></pre>
+          <pre id="success-pane" style="margin:0;font-family:inherit;display:none;"></pre>
+          <pre id="error-pane" style="margin:0;font-family:inherit;display:none;"></pre>
+        </div>
+      </div>
+      
+      <aside class="insights-rail ops-live-rail" aria-label="Registration insights">
       <section class="insight-card live-overview-card">
         <header class="live-overview-head">
           <span class="live-overview-title"><span class="live-overview-icon" aria-hidden="true"></span>Live Overview</span>
@@ -344,8 +332,11 @@
         <span class="rail-hidden-metric" id="insight-error-rate">0%</span>
       </section>
     </aside>
+
     </div>
   </div>
+</main>
+<!-- ------------------ TAB: GET SESSION ------------------ -->
 
   </div>
 </main>
