@@ -1,1 +1,1 @@
-window.API_BASE_URL = "http://YOUR_VPS_IP:8000"; // Ð?i thành IP/Domain c?a VPS
+window.API_BASE_URL = "http://20.189.200.114:8000";
