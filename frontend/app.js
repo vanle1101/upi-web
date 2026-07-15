@@ -9,7 +9,7 @@
     // 1. Meta tag (injected server-side khi loopback bind)
     const meta = document.querySelector('meta[name="auth-token"]');
     const metaVal = (meta && meta.content) || '';
-    if (metaVal) return metaVal;
+    if (metaVal && metaVal !== '__AUTH_TOKEN__') return metaVal;
     // 2. URL query param ?token=... (cho non-loopback access)
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get('token') || '';
@@ -18,7 +18,15 @@
       return urlToken;
     }
     // 3. localStorage (previously entered)
-    return localStorage.getItem(_LS_TOKEN) || '';
+    let stored = localStorage.getItem(_LS_TOKEN) || '';
+    if (!stored && window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost') {
+       stored = prompt('Vercel Static UI: Please enter the API Auth Token (see backend startup logs):');
+       if (stored) {
+         stored = stored.trim();
+         localStorage.setItem(_LS_TOKEN, stored);
+       }
+    }
+    return stored || '';
   }
   function withTokenQuery(url) {
     const t = getAuthToken();
