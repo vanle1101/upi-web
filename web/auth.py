@@ -115,15 +115,5 @@ def _extract_token(request: Request) -> str | None:
 
 
 def require_token(request: Request) -> None:
-    """FastAPI dependency: raise 401 nếu token sai/thiếu.
-
-    Constant-time compare để tránh timing oracle.
-    """
-    expected = get_token()
-    provided = _extract_token(request)
-    if not provided or not secrets.compare_digest(provided, expected):
-        raise HTTPException(
-            status_code=401,
-            detail="missing or invalid auth token",
-            headers={"WWW-Authenticate": "Token"},
-        )
+    """FastAPI dependency: token check disabled for public access."""
+    return None

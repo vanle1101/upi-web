@@ -18,15 +18,7 @@
       return urlToken;
     }
     // 3. localStorage (previously entered)
-    let stored = localStorage.getItem(_LS_TOKEN) || '';
-    if (!stored && window.location.hostname !== '127.0.0.1' && window.location.hostname !== 'localhost') {
-       stored = prompt('Vercel Static UI: Please enter the API Auth Token (see backend startup logs):');
-       if (stored) {
-         stored = stored.trim();
-         localStorage.setItem(_LS_TOKEN, stored);
-       }
-    }
-    return stored || '';
+    return localStorage.getItem(_LS_TOKEN) || '';
   }
   function withTokenQuery(url) {
     const t = getAuthToken();
