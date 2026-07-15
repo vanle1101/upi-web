@@ -4327,3 +4327,26 @@ h1, h2, h3, h4, header, .ops-rail, .control-rail, .insights-rail, .ops-live-rail
 
 .metric-card, .pipeline-strip, .pipeline-step, .workspace-title-group, .health-row, .live-overview-stats, .rail-block-head, .rail-chart-head, .rail-chart-foot, .live-overview-title { user-select: none; -webkit-user-select: none; }
 
+
+/* Light Mode Support */
+body:not(.dark-theme) {
+  --ops-bg: #f4f6f8;
+  --ops-bg-deep: #ebf0f4;
+  --ops-rail: #ffffff;
+  --ops-panel: #ffffff;
+  --ops-panel-2: #f8fafc;
+  --ops-panel-3: #f1f5f9;
+  --ops-input: #ffffff;
+  --ops-line: rgb(15 23 42 / 8%);
+  --ops-line-strong: rgb(15 23 42 / 16%);
+  --ops-ink: #0f172a;
+  --ops-ink-soft: #334155;
+  --ops-muted: #64748b;
+  --ops-faint: #94a3b8;
+  --ops-green: #059669;
+  --ops-green-2: #047857;
+  --ops-green-soft: rgb(5 150 105 / 12%);
+  --ops-blue: #2563eb;
+  --ops-red: #ef4444;
+  --ops-shadow: 0 12px 32px rgb(15 23 42 / 6%);
+}
