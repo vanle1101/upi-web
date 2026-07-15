@@ -21,11 +21,11 @@ echo [1/3] Dang thiet lap thong tin Turso Database...
 echo TURSO_DATABASE_URL=libsql://upi-lehongvan123.aws-ap-northeast-1.turso.io> .env
 echo TURSO_AUTH_TOKEN=eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODQwOTc5OTUsImlkIjoiMDE5ZjY0ODYtNmYwMS03MjYxLTlkNTgtZmM2OWQyNDBkN2ViIiwia2lkIjoianpXdXZWNHBIVU1EaEZHb3FDN29fcExMcUtFeURRYUlmZHAybGlNZ3RfRSIsInJpZCI6ImM1MTUyZTRiLTJhNDQtNDFiNy04ODY5LTRiZDY1OGRlZTg2OSJ9.1k3Jp60t38ZK7ZEzGzXJ1LM8N0ib1WnywXmF5tznsKJ4H98aLm9AF2-gPye0Xwyb_4iDbhB4oplJtXTERHVHBw>> .env
 
-:: 3. Mo cong Firewall 8083
-echo [2/3] Dang mo cong Firewall 8083...
+:: 3. Mo cong Firewall 80
+echo [2/3] Dang mo cong Firewall 80...
 netsh advfirewall firewall show rule name="UPI Web API" >nul 2>&1
 if %errorLevel% NEQ 0 (
-    netsh advfirewall firewall add rule name="UPI Web API" dir=in action=allow protocol=TCP localport=8083 >nul 2>&1
+    netsh advfirewall firewall add rule name="UPI Web API" dir=in action=allow protocol=TCP localport=80 >nul 2>&1
 )
 
 :: 4. Cai thu vien va chay
@@ -39,5 +39,5 @@ if errorlevel 1 (
 
 echo Dang khoi dong Server...
 timeout /t 3
-".venv\Scripts\python.exe" -m uvicorn web.server:app --host 0.0.0.0 --port 8083
+".venv\Scripts\python.exe" -m uvicorn web.server:app --host 0.0.0.0 --port 80
 pause
