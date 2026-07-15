@@ -9,7 +9,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/operations.css?v=__ASSET_VERSION__" />
+<link rel="stylesheet" href="/operations.css?v=__ASSET_VERSION__" />
+<script src="/config.js"></script>
+<script>
+  // config.js sẽ set window.API_BASE_URL
+  const originalFetch = window.fetch;
+  window.fetch = function() {
+    if (typeof arguments[0] === 'string' && arguments[0].startsWith('/')) {
+      arguments[0] = (window.API_BASE_URL || '') + arguments[0];
+    }
+    return originalFetch.apply(this, arguments);
+  };
+
+  const OriginalEventSource = window.EventSource;
+  window.EventSource = function(url, config) {
+    if (typeof url === 'string' && url.startsWith('/')) {
+      url = (window.API_BASE_URL || '') + url;
+    }
+    return new OriginalEventSource(url, config);
+  };
+</script>
 </head>
 <body>
 <script>
@@ -1028,17 +1047,17 @@
   </div>
 </div>
 
-<script src="/static/dialog.js?v=__ASSET_VERSION__"></script>
-<script src="/static/settings.js?v=__ASSET_VERSION__"></script>
-<script src="/static/app.js?v=__ASSET_VERSION__"></script>
-<script src="/static/session.js?v=__ASSET_VERSION__"></script>
-<script src="/static/link.js?v=__ASSET_VERSION__"></script>
-<script src="/static/hme.js?v=__ASSET_VERSION__"></script>
-<script src="/static/autoreg.js?v=__ASSET_VERSION__"></script>
-<script src="/static/upi.js?v=__ASSET_VERSION__"></script>
-<script src="/static/settings_panel.js?v=__ASSET_VERSION__"></script>
-<script src="/static/workspace.js?v=__ASSET_VERSION__"></script>
-<script src="/static/getacc.js?v=__ASSET_VERSION__"></script>
-<script src="/static/mac_select.js?v=__ASSET_VERSION__"></script>
+<script src="/dialog.js?v=__ASSET_VERSION__"></script>
+<script src="/settings.js?v=__ASSET_VERSION__"></script>
+<script src="/app.js?v=__ASSET_VERSION__"></script>
+<script src="/session.js?v=__ASSET_VERSION__"></script>
+<script src="/link.js?v=__ASSET_VERSION__"></script>
+<script src="/hme.js?v=__ASSET_VERSION__"></script>
+<script src="/autoreg.js?v=__ASSET_VERSION__"></script>
+<script src="/upi.js?v=__ASSET_VERSION__"></script>
+<script src="/settings_panel.js?v=__ASSET_VERSION__"></script>
+<script src="/workspace.js?v=__ASSET_VERSION__"></script>
+<script src="/getacc.js?v=__ASSET_VERSION__"></script>
+<script src="/mac_select.js?v=__ASSET_VERSION__"></script>
 </body>
 </html>

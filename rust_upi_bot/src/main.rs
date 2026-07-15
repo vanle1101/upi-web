@@ -98,7 +98,7 @@ struct Cli {
     session_buffer_ttl_seconds: u64,
 
     /// Watermark text vẽ phía dưới QR PNG (không đè lên QR). Empty = không vẽ.
-    #[arg(long, env = "QR_WATERMARK", default_value = "@prr9293", global = true)]
+    #[arg(long, env = "QR_WATERMARK", default_value = "", global = true)]
     qr_watermark: String,
 
     /// Telegram user ID để nhận thông báo khi user KHÁC tạo QR thành công.

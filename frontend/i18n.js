@@ -1,0 +1,235 @@
+const translations = {
+    en: {
+        app_title: "Dashboard | Gpt Signup Hybrid",
+        page_dashboard: "Dashboard",
+        nav_reg: "Registration",
+        nav_session: "Sessions",
+        nav_upi: "UPI Operations",
+        nav_getacc: "Get Accounts",
+        nav_link: "Link Gen",
+        nav_hme: "HME Manager",
+        nav_settings: "Settings",
+        
+        reg_inputs: "Inputs & Config",
+        reg_mail_mode: "Mail Mode",
+        reg_mode: "Reg Mode",
+        reg_combo: "Combo (Email:Password)",
+        reg_default_pass: "Default Password",
+        reg_use_proxy: "Use Proxy",
+        reg_controls: "Controls",
+        reg_timeout: "Job Timeout (s)",
+        reg_retry_max: "Auto Retry Max",
+        reg_btn_run: "Start Registration",
+        reg_btn_stop: "Stop All",
+        reg_btn_retry: "Retry Failed",
+        reg_btn_clear_input: "Clear Input",
+        reg_output: "Output & Logs",
+        reg_btn_clear_done: "Clear Done",
+        reg_btn_clear_all: "Clear All",
+        reg_btn_clear_log: "Clear Log",
+        reg_btn_copy_success: "Copy Success",
+        reg_btn_copy_error: "Copy Error",
+
+        ses_inputs: "Session Inputs",
+        ses_combo: "Combo (Email:Password)",
+        ses_timeout: "Job Timeout (s)",
+        ses_controls: "Controls",
+        ses_btn_run: "Get Session",
+        ses_btn_stop: "Stop All",
+        ses_btn_clear_input: "Clear Input",
+        ses_btn_clear_done: "Clear Done",
+        ses_output: "Output & Logs",
+        ses_btn_clear_log: "Clear Log",
+        ses_btn_copy_error: "Copy Error",
+
+        upi_inputs: "UPI Inputs",
+        upi_combo: "Combo Input",
+        upi_session: "Session Input",
+        upi_proxy_step: "Proxy Step",
+        upi_proxy_input: "Custom Proxy",
+        upi_use_proxy: "Use Proxy",
+        upi_notify: "Notify",
+        upi_controls: "Controls",
+        upi_timeout: "Job Timeout (s)",
+        upi_retries: "Approve Retries",
+        upi_btn_run: "Get UPI QR",
+        upi_btn_stop: "Stop All",
+        upi_btn_retry_failed: "Retry Failed",
+        upi_btn_retry_exp: "Retry Exp/Free",
+        upi_btn_clear_input: "Clear Input",
+        upi_output: "Output & Logs",
+        upi_btn_clear_done: "Clear Done",
+        upi_btn_clear_all: "Clear All",
+        upi_btn_copy_success: "Copy Success",
+        upi_btn_copy_error: "Copy Error",
+        
+        getacc_inputs: "Get Account Data",
+        getacc_json: "JSON Input",
+        getacc_controls: "Controls",
+        getacc_btn_extract: "Extract Credentials",
+        getacc_btn_clear: "Clear All",
+
+        link_inputs: "Link Gen Inputs",
+        link_combo: "Combo Input",
+        link_region: "Region",
+        link_timeout: "Job Timeout (s)",
+        link_controls: "Controls",
+        link_btn_run: "Get Link",
+        link_btn_stop: "Stop All",
+        link_btn_clear_input: "Clear Input",
+        link_btn_clear_done: "Clear Done",
+        link_btn_copy_error: "Copy Error",
+        
+        hme_profiles: "Profiles",
+        hme_filter: "Filter Profiles",
+        hme_btn_refresh: "Refresh",
+        hme_btn_pool: "Pool",
+        hme_btn_add: "Add Profile",
+        hme_btn_privacy: "Privacy Toggle",
+        hme_runner: "Runner Control",
+        hme_action: "Action",
+        hme_count: "Count/Cycle",
+        hme_interval: "Retry Interval (s)",
+        hme_label: "Label",
+        hme_note: "Note",
+        hme_btn_start: "Start Runner",
+        hme_btn_stop: "Stop Runner",
+        hme_btn_clear_log: "Clear Log",
+        hme_emails: "Emails",
+        hme_autoreg: "Auto-Reg Config",
+        
+        set_proxies: "Proxy Pool"
+    },
+    vi: {
+        app_title: "Bảng điều khiển | Gpt Signup Hybrid",
+        page_dashboard: "Bảng điều khiển",
+        nav_reg: "Đăng ký",
+        nav_session: "Phiên (Session)",
+        nav_upi: "Tạo mã UPI",
+        nav_getacc: "Lấy tài khoản",
+        nav_link: "Tạo Link",
+        nav_hme: "Quản lý HME",
+        nav_settings: "Cài đặt",
+        
+        reg_inputs: "Thông tin nhập & Cấu hình",
+        reg_mail_mode: "Chế độ Mail",
+        reg_mode: "Chế độ đăng ký",
+        reg_combo: "Danh sách (Email:Password)",
+        reg_default_pass: "Mật khẩu mặc định",
+        reg_use_proxy: "Dùng Proxy",
+        reg_controls: "Điều khiển",
+        reg_timeout: "Giới hạn thời gian (s)",
+        reg_retry_max: "Số lần thử lại",
+        reg_btn_run: "Bắt đầu Đăng ký",
+        reg_btn_stop: "Dừng tất cả",
+        reg_btn_retry: "Thử lại lỗi",
+        reg_btn_clear_input: "Xoá khung nhập",
+        reg_output: "Kết quả & Nhật ký",
+        reg_btn_clear_done: "Xoá Đã xong",
+        reg_btn_clear_all: "Xoá Tất cả",
+        reg_btn_clear_log: "Xoá Nhật ký",
+        reg_btn_copy_success: "Sao chép Thành công",
+        reg_btn_copy_error: "Sao chép Lỗi",
+
+        ses_inputs: "Nhập liệu Session",
+        ses_combo: "Danh sách (Email:Password)",
+        ses_timeout: "Giới hạn thời gian (s)",
+        ses_controls: "Điều khiển",
+        ses_btn_run: "Lấy Session",
+        ses_btn_stop: "Dừng tất cả",
+        ses_btn_clear_input: "Xoá khung nhập",
+        ses_btn_clear_done: "Xoá Đã xong",
+        ses_output: "Kết quả & Nhật ký",
+        ses_btn_clear_log: "Xoá Nhật ký",
+        ses_btn_copy_error: "Sao chép Lỗi",
+
+        upi_inputs: "Nhập liệu UPI",
+        upi_combo: "Danh sách Email",
+        upi_session: "Nhập Session",
+        upi_proxy_step: "Bước dùng Proxy",
+        upi_proxy_input: "Proxy tuỳ chỉnh",
+        upi_use_proxy: "Dùng Proxy",
+        upi_notify: "Thông báo",
+        upi_controls: "Điều khiển",
+        upi_timeout: "Giới hạn thời gian (s)",
+        upi_retries: "Số lần thử phê duyệt",
+        upi_btn_run: "Tạo QR UPI",
+        upi_btn_stop: "Dừng tất cả",
+        upi_btn_retry_failed: "Thử lại Lỗi",
+        upi_btn_retry_exp: "Thử lại Hết hạn/Miễn phí",
+        upi_btn_clear_input: "Xoá khung nhập",
+        upi_output: "Kết quả & Nhật ký",
+        upi_btn_clear_done: "Xoá Đã xong",
+        upi_btn_clear_all: "Xoá Tất cả",
+        upi_btn_copy_success: "Sao chép Thành công",
+        upi_btn_copy_error: "Sao chép Lỗi",
+        
+        getacc_inputs: "Dữ liệu lấy tài khoản",
+        getacc_json: "Nhập JSON",
+        getacc_controls: "Điều khiển",
+        getacc_btn_extract: "Trích xuất thông tin",
+        getacc_btn_clear: "Xoá Tất cả",
+
+        link_inputs: "Nhập liệu tạo Link",
+        link_combo: "Danh sách",
+        link_region: "Khu vực",
+        link_timeout: "Giới hạn thời gian (s)",
+        link_controls: "Điều khiển",
+        link_btn_run: "Tạo Link",
+        link_btn_stop: "Dừng tất cả",
+        link_btn_clear_input: "Xoá khung nhập",
+        link_btn_clear_done: "Xoá Đã xong",
+        link_btn_copy_error: "Sao chép Lỗi",
+        
+        hme_profiles: "Cấu hình",
+        hme_filter: "Lọc cấu hình",
+        hme_btn_refresh: "Làm mới",
+        hme_btn_pool: "Kho Pool",
+        hme_btn_add: "Thêm Cấu hình",
+        hme_btn_privacy: "Chế độ riêng tư",
+        hme_runner: "Điều khiển Chạy",
+        hme_action: "Hành động",
+        hme_count: "Số lượng/Chu kỳ",
+        hme_interval: "Thời gian chờ (s)",
+        hme_label: "Nhãn",
+        hme_note: "Ghi chú",
+        hme_btn_start: "Bắt đầu chạy",
+        hme_btn_stop: "Dừng chạy",
+        hme_btn_clear_log: "Xoá Nhật ký",
+        hme_emails: "Danh sách Email",
+        hme_autoreg: "Cấu hình tự động ĐK",
+        
+        set_proxies: "Kho Proxy"
+    }
+};
+
+function applyTranslations(lang) {
+    if (!translations[lang]) return;
+    
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang][key]) {
+            if (el.tagName === 'INPUT' && el.type === 'text') {
+                el.placeholder = translations[lang][key];
+            } else {
+                el.textContent = translations[lang][key];
+            }
+        }
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('app_lang', lang);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('app_lang') || 'en';
+    const langSelect = document.getElementById('lang-toggle');
+    if(langSelect) {
+        langSelect.value = savedLang;
+        langSelect.addEventListener('change', (e) => {
+            applyTranslations(e.target.value);
+        });
+    }
+    applyTranslations(savedLang);
+});

@@ -92,12 +92,28 @@ class DatabaseEngine:
                 )
 
     def _create_connection(self) -> sqlite3.Connection:
-        """Tạo và configure SQLite connection."""
-        conn = sqlite3.connect(
-            str(self._db_path),
-            check_same_thread=False,
-            isolation_level=None,  # Manual transaction control
-        )
+        """Tạo và configure SQLite connection (hỗ trợ Turso nếu có ENV)."""
+        turso_url = os.environ.get("TURSO_DATABASE_URL")
+        turso_auth = os.environ.get("TURSO_AUTH_TOKEN", "")
+        
+        if turso_url:
+            try:
+                import libsql_experimental as libsql
+                conn = libsql.connect(turso_url, auth_token=turso_auth)
+            except ImportError:
+                import logging
+                logging.getLogger(__name__).warning("TURSO_DATABASE_URL is set but libsql_experimental is not installed. Falling back to local SQLite.")
+                conn = sqlite3.connect(
+                    str(self._db_path),
+                    check_same_thread=False,
+                    isolation_level=None,  # Manual transaction control
+                )
+        else:
+            conn = sqlite3.connect(
+                str(self._db_path),
+                check_same_thread=False,
+                isolation_level=None,  # Manual transaction control
+            )
         conn.row_factory = sqlite3.Row
 
         # Configure pragmas
@@ -402,11 +418,25 @@ class DatabaseEngine:
         if conn is not None:
             return conn
 
-        conn = sqlite3.connect(
-            str(self._db_path),
-            check_same_thread=False,
-            isolation_level=None,
-        )
+        turso_url = os.environ.get("TURSO_DATABASE_URL")
+        turso_auth = os.environ.get("TURSO_AUTH_TOKEN", "")
+        
+        if turso_url:
+            try:
+                import libsql_experimental as libsql
+                conn = libsql.connect(turso_url, auth_token=turso_auth)
+            except ImportError:
+                conn = sqlite3.connect(
+                    str(self._db_path),
+                    check_same_thread=False,
+                    isolation_level=None,
+                )
+        else:
+            conn = sqlite3.connect(
+                str(self._db_path),
+                check_same_thread=False,
+                isolation_level=None,
+            )
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA busy_timeout=5000")

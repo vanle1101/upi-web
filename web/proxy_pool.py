@@ -11,12 +11,11 @@ Settings Store (`proxy.pool` + `proxy.rotation_mode`) lúc startup
 `POST /api/proxy/pool`.
 
 Thiết kế:
-- Một singleton dùng CHUNG cho cả 3 manager (reg / session / link) để rotation
-  là toàn cục → 2 job song song không pick cùng 1 IP liên tiếp.
+- Singleton này chỉ còn phục vụ Session / Link legacy flow. Reg và UPI dùng
+  lần lượt ``reg.proxy`` và ``upi.proxy`` riêng, không đọc pool này.
 - ``pick()`` chọn proxy kế tiếp trong số proxy còn "live" theo mode
   (round_robin | random). Proxy đã bị ``mark_dead`` sẽ bị loại khỏi vòng xoay.
-- Pool rỗng hoặc tất cả proxy đã chết → ``pick()`` trả None; caller chạy direct
-  (không proxy). Đây là nguồn cấu hình proxy DUY NHẤT của hệ thống.
+- Pool rỗng hoặc tất cả proxy đã chết → ``pick()`` trả None; caller chạy direct.
 
 Concurrency: FastAPI chạy single event loop, các method mutate state đồng bộ
 (không ``await`` giữa chừng) nên không cần lock.
@@ -151,19 +150,14 @@ class ProxyPool:
             return any(p not in self._dead for p in self._entries)
 
     def status(self) -> dict:
-        """Snapshot trạng thái pool cho UI (đếm + danh sách dead đã mask credential).
-
-        Dead-list mask qua ``proxy_format.mask_proxy`` để KHÔNG lộ user:pass/SID-pass
-        raw ra ``GET /api/proxy/pool`` (F-F).
-        """
-        from .proxy_format import mask_proxy
+        """Snapshot trạng thái pool cho UI."""
         with self._lock:
             live = [p for p in self._entries if p not in self._dead]
             return {
                 "mode": self._mode,
                 "total": len(self._entries),
                 "live": len(live),
-                "dead": sorted(mask_proxy(d) for d in self._dead),
+                "dead": list(self._dead),
             }
 
 
@@ -179,4 +173,28 @@ def get_proxy_pool() -> ProxyPool:
     return _PROXY_POOL
 
 
-__all__ = ["ProxyPool", "get_proxy_pool", "normalize_proxies"]
+async def auto_check_loop():
+    """Background task to check proxies every 1 minute."""
+    import asyncio
+    # Import inside task to avoid circular import with server.py
+    from .server import _probe_one_proxy
+
+    while True:
+        try:
+            pool = get_proxy_pool()
+            entries = pool.entries
+            if entries:
+                async def _check_and_mark(p):
+                    res = await _probe_one_proxy(p)
+                    if res["ok"]:
+                        pool.mark_alive(p)
+                    else:
+                        pool.mark_dead(p)
+
+                tasks = [asyncio.create_task(_check_and_mark(p)) for p in entries]
+                await asyncio.gather(*tasks, return_exceptions=True)
+        except Exception:
+            pass
+        await asyncio.sleep(60)
+
+__all__ = ["ProxyPool", "get_proxy_pool", "normalize_proxies", "auto_check_loop"]

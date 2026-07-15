@@ -58,7 +58,7 @@ _EXACT_KEYS: frozenset[str] = frozenset([
     "reg.mode", "reg.headless", "reg.debug", "reg.default_password",
     "reg.job_timeout", "reg.post_reg_get_session", "reg.post_reg_get_link",
     "reg.post_reg_link_region", "reg.auto_retry", "reg.auto_retry_max",
-    "reg.auto_retry_delay", "reg.max_concurrent", "reg.use_proxy",
+    "reg.auto_retry_delay", "reg.max_concurrent", "reg.use_proxy", "reg.proxy",
     "proxy.pool", "proxy.rotation_mode",
     "proxy.probe_endpoint", "proxy.probe_timeout", "proxy.max_tries",
     "proxy.sid_len", "proxy.sid_retry_per_line", "proxy.probe_concurrency",
@@ -72,15 +72,16 @@ _EXACT_KEYS: frozenset[str] = frozenset([
     "upi.max_concurrent", "upi.job_timeout", "upi.approve_retries",
     "upi.notify_enabled",
     "upi.approve.restart_threshold", "upi.approve.max_restarts",
-    "upi.proxy_from_step",
+    "upi.proxy_from_step", "upi.use_proxy", "upi.proxy",
     "telegram.bot_token", "telegram.chat_id",
     "ui.active_tab", "ui.link_mode",
     "web.auth_token",
+    "session.max_concurrent", "link.max_concurrent",
 ])
 
 # Sensitive keys — audit log redact value thành "***" (R10.5)
 _SENSITIVE_KEYS: frozenset[str] = frozenset([
-    "proxy.pool", "autoreg.api_key",
+    "proxy.pool", "reg.proxy", "upi.proxy", "autoreg.api_key",
     "mail_mode.worker_config",
     "telegram.bot_token",
     "web.auth_token",
@@ -115,7 +116,8 @@ def _validate_type_constraint(key: str, value: Any) -> None:
         return
 
     if key in ("reg.headless", "reg.debug", "reg.post_reg_get_session",
-               "reg.post_reg_get_link", "reg.auto_retry", "reg.use_proxy"):
+               "reg.post_reg_get_link", "reg.auto_retry", "reg.use_proxy",
+               "upi.use_proxy"):
         if not isinstance(value, bool):
             raise RepositoryError(
                 "set", TypeError(f"{key}: must be bool, got {type(value).__name__}")
@@ -126,6 +128,17 @@ def _validate_type_constraint(key: str, value: Any) -> None:
         if value is not None and not isinstance(value, str):
             raise RepositoryError(
                 "set", TypeError(f"{key}: must be str or null, got {type(value).__name__}")
+            )
+        return
+
+    if key in ("reg.proxy", "upi.proxy"):
+        if value is not None and not isinstance(value, str):
+            raise RepositoryError(
+                "set", TypeError(f"{key}: must be str or null, got {type(value).__name__}")
+            )
+        if isinstance(value, str) and len(value) > 32768:
+            raise RepositoryError(
+                "set", ValueError(f"{key}: must be at most 32768 characters")
             )
         return
 
@@ -371,7 +384,7 @@ def _validate_type_constraint(key: str, value: Any) -> None:
         return
 
     # --- upi namespace ---
-    if key == "upi.max_concurrent":
+    if key in ("upi.max_concurrent", "session.max_concurrent", "link.max_concurrent"):
         if not isinstance(value, int) or isinstance(value, bool):
             raise RepositoryError(
                 "set", TypeError(f"{key}: must be int, got {type(value).__name__}")
@@ -387,9 +400,9 @@ def _validate_type_constraint(key: str, value: Any) -> None:
             raise RepositoryError(
                 "set", TypeError(f"{key}: must be int, got {type(value).__name__}")
             )
-        if not (60 <= value <= 7200):
+        if value != 0 and not (60 <= value <= 7200):
             raise RepositoryError(
-                "set", ValueError(f"{key}: must be in [60, 7200], got {value}")
+                "set", ValueError(f"{key}: must be 0 or in [60, 7200], got {value}")
             )
         return
 
@@ -2497,6 +2510,18 @@ class ChatGptAccountRepository:
         ).fetchall()
 
         return [dict(row) for row in rows], total
+
+    def get_by_email(self, email: str) -> dict | None:
+        """Lấy thông tin tài khoản ChatGPT theo email.
+
+        Returns:
+            dict chứa thông tin tài khoản (gồm password và secret_2fa), hoặc None.
+        """
+        conn = self._engine.raw_connection()
+        row = conn.execute(
+            "SELECT * FROM chatgpt_accounts WHERE email = ? COLLATE NOCASE", (email,)
+        ).fetchone()
+        return dict(row) if row else None
 
     def get_created_emails(self, limit: int = 10) -> list[str]:
         """SELECT email FROM icloud_emails WHERE status='created' LIMIT ?.

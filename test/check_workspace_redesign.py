@@ -34,7 +34,9 @@ class StructureParser(HTMLParser):
 
 def main() -> int:
     html = (ROOT / "web" / "static" / "index.html").read_text(encoding="utf-8")
-    css = (ROOT / "web" / "static" / "workspace.css").read_text(encoding="utf-8")
+    workspace_css = (ROOT / "web" / "static" / "workspace.css").read_text(encoding="utf-8")
+    operations_css = (ROOT / "web" / "static" / "operations.css").read_text(encoding="utf-8")
+    css = f"{workspace_css}\n{operations_css}"
     js = (ROOT / "web" / "static" / "workspace.js").read_text(encoding="utf-8")
     parser = StructureParser()
     parser.feed(html)
@@ -55,18 +57,18 @@ def main() -> int:
         ('class="tab-content ops-workspace ops-session"' in html, "Get Session uses the new workspace"),
         ('class="tab-content ops-workspace ops-upi"' in html, "UPI uses the new workspace"),
         ('class="tab-content settings-page"' in html, "Settings uses the dedicated page layout"),
-        ("grid-template-columns: var(--sidebar-width) minmax(0, 1fr)" in css,
-         "desktop command rail shell is configured"),
-        ("--page: #f1efe9" in css and "color-scheme: light" in css,
-         "workspace uses the warm light-first palette"),
-        ("background: var(--rail)" in css and "background: var(--paper)" in css,
-         "dark navigation is isolated from light product surfaces"),
-        (".topbar .toggle-wrap input:checked ~ .toggle-label" in css,
-         "checked runtime toggle labels remain readable on the dark rail"),
+        ("grid-template-columns: var(--ops-rail-width) minmax(0, 1fr)" in operations_css,
+         "desktop side-rail shell is configured"),
+        ("--ops-bg: #071017" in operations_css and "color-scheme: dark" in operations_css,
+         "workspace uses the dark operations-console palette"),
+        ("width: var(--ops-rail-width)" in operations_css and ".tab-btn.active" in operations_css,
+         "navigation is isolated in the dark command rail"),
+        (".toggle-wrap input:checked ~ .toggle-label" in css,
+         "checked runtime toggle labels remain readable on the command rail"),
         ("font-size: 14px" in css and "font-size: 12.5px" in css,
          "interface typography uses the larger readable scale"),
-        (".proxy-pool-input," in css and "background: #fffefa" in css,
-         "specialized proxy and modal inputs use visible light surfaces"),
+        (".proxy-textarea" in css and "background: var(--ops-input)" in operations_css,
+         "specialized proxy and modal inputs use visible dark surfaces"),
         (".tab-content input:disabled" in css and ".tab-content button:disabled" in css,
          "disabled form and action states remain readable"),
         (".diagnostics-dock" in css and ".dock-panel[hidden]" in css,

@@ -10,6 +10,7 @@ from typing import Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from .auth import get_token, require_token  # token-based auth
@@ -43,6 +44,14 @@ def _asset_version() -> str:
 
 
 app = FastAPI(title="gpt_signup_hybrid web UI", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Module-level engine reference for graceful shutdown
 _engine = None
@@ -99,6 +108,12 @@ async def on_startup():
     get_telegram_notifier().apply_settings(all_settings)
 
     _log.info("startup: SQLite engine initialized, settings hydrated, job recovery done")
+
+    # Start proxy auto-check loop
+    import asyncio
+    from .proxy_pool import auto_check_loop
+    asyncio.create_task(auto_check_loop())
+
 
     # â”€â”€ Register SseMux snapshot functions (Requirements 5.1, 5.2, 5.3) â”€â”€
     # Each lambda captures the manager/buffer reference and builds the snapshot
@@ -275,8 +290,9 @@ class SetConfigRequest(BaseModel):
     auto_retry_delay: float | None = Field(default=None, ge=5, le=120)
     use_proxy: bool | None = Field(
         default=None,
-        description="Báº­t/táº¯t Ã¡p dá»¥ng proxy pool cho Reg jobs. False = cháº¡y direct.",
+        description="Bật/tắt proxy riêng cho Reg jobs. False = chạy direct.",
     )
+    proxy: str | None = Field(default=None, max_length=32768)
 
 
 @app.get("/api/jobs")
@@ -443,6 +459,7 @@ async def get_config() -> JSONResponse:
         "auto_retry_max": manager.auto_retry_max,
         "auto_retry_delay": manager.auto_retry_delay,
         "use_proxy": manager.use_proxy,
+        "proxy": manager.proxy,
     })
 
 
@@ -507,6 +524,11 @@ async def set_config(payload: SetConfigRequest) -> JSONResponse:
             max_retries=payload.auto_retry_max,
             delay=payload.auto_retry_delay,
         )
+    if payload.proxy is not None:
+        try:
+            manager.set_proxy(payload.proxy)
+        except ValueError as exc:
+            raise HTTPException(400, f"invalid Reg proxy: {exc}")
     if payload.use_proxy is not None:
         manager.set_use_proxy(payload.use_proxy)
 
@@ -536,6 +558,8 @@ async def set_config(payload: SetConfigRequest) -> JSONResponse:
         settings_dict["reg.auto_retry_delay"] = int(payload.auto_retry_delay)
     if payload.use_proxy is not None:
         settings_dict["reg.use_proxy"] = payload.use_proxy
+    if payload.proxy is not None:
+        settings_dict["reg.proxy"] = manager.proxy
 
     response_body = {
         "max_concurrent": manager.max_concurrent,
@@ -549,6 +573,7 @@ async def set_config(payload: SetConfigRequest) -> JSONResponse:
         "auto_retry_max": manager.auto_retry_max,
         "auto_retry_delay": manager.auto_retry_delay,
         "use_proxy": manager.use_proxy,
+        "proxy": manager.proxy,
     }
 
     if settings_dict:
@@ -762,6 +787,32 @@ async def test_all_proxy(payload: TestAllProxyRequest) -> JSONResponse:
     })
 
 
+@app.post("/api/proxy/test-stream")
+async def test_stream_proxy(payload: TestAllProxyRequest) -> StreamingResponse:
+    from .proxy_pool import get_proxy_pool, normalize_proxies
+
+    if payload.proxies is not None:
+        targets = normalize_proxies(payload.proxies)
+    else:
+        targets = normalize_proxies(_get_settings_repo().get("proxy.pool") or [])
+
+    if not targets:
+        return StreamingResponse(iter([]), media_type="application/x-ndjson")
+
+    async def generate():
+        pool = get_proxy_pool()
+        tasks = [asyncio.create_task(_probe_one_proxy(p)) for p in targets]
+        for coro in asyncio.as_completed(tasks):
+            item = await coro
+            if item["ok"]:
+                pool.mark_alive(item["proxy"])
+            else:
+                pool.mark_dead(item["proxy"])
+            yield json.dumps(item) + "\n"
+
+    return StreamingResponse(generate(), media_type="application/x-ndjson")
+
+
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 # Unified SSE Endpoint (all channels multiplexed)
 # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -944,9 +995,10 @@ async def set_session_config(payload: SetSessionConfigRequest) -> JSONResponse:
     sm = get_session_manager()
     if payload.max_concurrent is not None:
         try:
-            # Silent clamp vá» [1, 10] (Session max).
-            clamped = max(1, min(payload.max_concurrent, 10))
+            # Silent clamp vá»  [1, 50] (Session max).
+            clamped = max(1, min(payload.max_concurrent, 50))
             sm.set_max_concurrent(clamped)
+            _get_settings_repo().set("session.max_concurrent", clamped)
         except ValueError as exc:
             raise HTTPException(400, str(exc))
     if payload.job_timeout is not None:
@@ -1686,12 +1738,14 @@ class AddUpiJobsRequest(BaseModel):
 class SetUpiConfigRequest(BaseModel):
     # Reject invalid config instead of silently clamping user input.
     max_concurrent: int | None = Field(default=None, ge=1, le=50)
-    job_timeout: float | None = Field(default=None, ge=60, le=7200)
+    job_timeout: float | None = Field(default=None, ge=0, le=7200)
     approve_retries: int | None = Field(default=None, ge=1, le=2000)
     notify_enabled: bool | None = Field(default=None)
     restart_threshold: int | None = Field(default=None, ge=0, le=1000)
     max_restarts: int | None = Field(default=None, ge=0, le=100)
     proxy_from_step: int | None = Field(default=None, ge=1, le=6)
+    use_proxy: bool | None = None
+    proxy: str | None = Field(default=None, max_length=32768)
 
 
 class SetTelegramConfigRequest(BaseModel):
@@ -1864,6 +1918,8 @@ async def get_upi_config() -> JSONResponse:
         "restart_threshold": um.restart_threshold,
         "max_restarts": um.max_restarts,
         "proxy_from_step": um.proxy_from_step,
+        "use_proxy": um.use_proxy,
+        "proxy": um.proxy,
         "notify_enabled": get_telegram_notifier().enabled,
     })
 
@@ -1912,6 +1968,15 @@ async def set_upi_config(payload: SetUpiConfigRequest) -> JSONResponse:
             settings_writes["upi.proxy_from_step"] = payload.proxy_from_step
         except ValueError as exc:
             raise HTTPException(400, str(exc))
+    if payload.proxy is not None:
+        try:
+            um.set_proxy(payload.proxy)
+            settings_writes["upi.proxy"] = um.proxy
+        except ValueError as exc:
+            raise HTTPException(400, f"invalid UPI proxy: {exc}")
+    if payload.use_proxy is not None:
+        um.set_use_proxy(payload.use_proxy)
+        settings_writes["upi.use_proxy"] = payload.use_proxy
     if payload.notify_enabled is not None:
         get_telegram_notifier().set_enabled(payload.notify_enabled)
         settings_writes["upi.notify_enabled"] = payload.notify_enabled
@@ -1929,6 +1994,8 @@ async def set_upi_config(payload: SetUpiConfigRequest) -> JSONResponse:
         "restart_threshold": um.restart_threshold,
         "max_restarts": um.max_restarts,
         "proxy_from_step": um.proxy_from_step,
+        "use_proxy": um.use_proxy,
+        "proxy": um.proxy,
         "notify_enabled": get_telegram_notifier().enabled,
     })
 
@@ -2031,6 +2098,34 @@ async def notify_upi_job(job_id: str) -> JSONResponse:
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(500, f"{type(exc).__name__}: {exc}")
     return JSONResponse({"ok": True})
+
+
+@app.get("/api/account-credentials")
+async def get_account_credentials(email: str, request: Request) -> JSONResponse:
+    """Lookup account password and 2fa by email."""
+    # Check token if needed (assuming standard auth)
+    require_token(request)
+
+    if not email:
+        raise HTTPException(400, "email query parameter is required")
+
+    from db import get_engine
+    from db.repositories import ChatGptAccountRepository
+
+    repo = ChatGptAccountRepository(get_engine())
+    acc = repo.get_by_email(email)
+
+    if not acc:
+        return JSONResponse({"success": False, "error": f"Không tìm thấy thông tin pass/2fa cho email {email}"})
+
+    password = acc.get("password") or ""
+    secret = acc.get("secret_2fa") or ""
+    # Trả về format mail|pass|2fa
+    credentials = f"{email}|{password}"
+    if secret:
+        credentials += f"|{secret}"
+
+    return JSONResponse({"success": True, "credentials": credentials})
 
 
 # Mount static folder cho CSS/JS

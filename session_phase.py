@@ -1438,4 +1438,9 @@ async def get_session_pure_request(
             except Exception:
                 pass
 
-    return await asyncio.to_thread(_sync)
+    try:
+        return await asyncio.to_thread(_sync)
+    except SessionError:
+        raise
+    except Exception as exc:
+        raise SessionError(f"Network/Timeout error: {exc}") from exc

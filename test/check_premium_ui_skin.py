@@ -11,7 +11,8 @@ except AttributeError:
     pass
 
 ROOT = Path(__file__).resolve().parents[1]
-CSS = ROOT / "web" / "static" / "style.css"
+STYLE_CSS = ROOT / "web" / "static" / "style.css"
+OPERATIONS_CSS = ROOT / "web" / "static" / "operations.css"
 
 
 def _balanced_braces(src: str) -> bool:
@@ -43,16 +44,20 @@ def _balanced_braces(src: str) -> bool:
 
 
 def main() -> int:
-    src = CSS.read_text(encoding="utf-8")
+    base_src = STYLE_CSS.read_text(encoding="utf-8")
+    operations_src = OPERATIONS_CSS.read_text(encoding="utf-8")
+    src = f"{base_src}\n{operations_src}"
     checks = [
-        ("Premium operations skin" in src, "premium skin layer exists"),
+        ("GSH Control Room" in operations_src, "premium control-room shell exists"),
         (_balanced_braces(src), "CSS braces are balanced"),
-        ('--font-sans: "Geist"' in src, "Geist typography stack selected"),
+        ('--ops-sans: "Outfit"' in operations_src and '"Geist"' in operations_src,
+         "premium typography stack selected"),
         (".topbar" in src and "backdrop-filter" in src, "premium command topbar styles exist"),
         (".tab-btn.active" in src and ".settings-nav-item.active" in src, "nav and settings active states styled"),
         (".card:hover" in src and ".job:hover" in src, "card and job hover physics exist"),
         (".modal" in src and ".upi-qr-modal-image-wrap" in src, "modal and UPI QR surfaces styled"),
-        ("#tab-hme.hme-grid" in src and ".hme-table tbody tr:hover" in src, "HME grid and table styling covered"),
+        (".settings-workspace" in src and ".settings-section.active" in src,
+         "settings workspace styling covered"),
         ("grid-auto-flow: dense" in src, "dense grid behavior enabled"),
         ("SECTION 01" not in src and "QUESTION 05" not in src, "no cheap meta labels added"),
     ]

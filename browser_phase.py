@@ -1112,10 +1112,10 @@ async def _drive_signup_flow(
                 pass  # cookie có thể chưa cần thiết, thử fill xem có pass không
             callback_url = await _fill_about_you(
                 page, name=request.name, birthdate=request.birthdate,
-                timeout_seconds=60.0, log=log,
+                timeout_seconds=180.0, log=log,
             )
             # Sau /about-you có thể vẫn còn step (rare), tiếp tục loop để chờ chatgpt.com
-            await _wait_chatgpt_session(ctx, page, timeout_seconds=60.0, log=log)
+            await _wait_chatgpt_session(ctx, page, timeout_seconds=180.0, log=log)
             return callback_url, otp_seconds_total
 
         # screen == 'unknown' → đợi page settle
@@ -1167,13 +1167,13 @@ async def _handle_login_after_password(
             page,
             name=request.name,
             birthdate=request.birthdate,
-            timeout_seconds=30.0,
+            timeout_seconds=180.0,
             log=log,
         )
     else:
         callback_url = callback_holder.get("url") or page.url
 
-    await _wait_chatgpt_session(ctx, page, timeout_seconds=60.0, log=log)
+    await _wait_chatgpt_session(ctx, page, timeout_seconds=180.0, log=log)
     return callback_url, otp_seconds
 
 

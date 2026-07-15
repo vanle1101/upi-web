@@ -183,6 +183,26 @@ def _mask_proxy(proxy: str | None) -> str:
     return mask_proxy(proxy)
 
 
+def _split_proxy_lines(value: str | None) -> list[str]:
+    """Normalize multiline proxy config into raw proxy lines."""
+    if not value:
+        return []
+    seen: set[str] = set()
+    out: list[str] = []
+    for line in value.splitlines():
+        raw = line.strip()
+        if not raw or raw in seen:
+            continue
+        seen.add(raw)
+        out.append(raw)
+    return out
+
+
+def _normalize_proxy_text(value: str | None) -> str | None:
+    lines = _split_proxy_lines(value)
+    return "\n".join(lines) if lines else None
+
+
 def _is_proxy_network_error(exc_or_msg) -> bool:
     """True nếu lỗi là network/proxy → đáng để mark proxy chết.
 
@@ -526,10 +546,10 @@ class JobManager:
         self._auto_retry: bool = False
         self._auto_retry_max: int = 3
         self._auto_retry_delay: float = 15.0
-        # Toggle áp dụng proxy pool cho job (per-Reg). False = job chạy direct
-        # (no proxy) — bỏ qua acquire ở _begin_job_proxy / rerun / 2FA branch.
-        # Default True để giữ behavior cũ.
-        self._use_proxy: bool = True
+        # Proxy riêng của Reg. Blank = direct; không đọc proxy.pool dùng chung.
+        self._proxy: str | None = None
+        self._use_proxy: bool = False
+        self._proxy_cursor: int = 0
         # Stagger: tránh nhiều browser khởi tạo cùng 1 lúc → random 5-10s giữa các start
         self._stagger_lock = asyncio.Lock()
         self._last_start_ts: float = 0.0
@@ -652,28 +672,15 @@ class JobManager:
         self._job_timeout = float(seconds)
 
     async def _begin_job_proxy(self, job: "Job", log) -> str | None:
-        """Resolve proxy live qua health-check; set transient fields cho job.
-
-        ``_active_proxy`` = concrete URL (replay cùng IP); ``_active_proxy_line`` =
-        raw line (mark_dead key, F-J). Knob load 1 lần/job → cache ``_proxy_knobs``
-        (F-H). acquire_live_proxy tự log live/rotate/dead qua ``log``.
-
-        Toggle ``self._use_proxy`` = False → skip acquire, set transient fields
-        = None để runner build session direct (no proxy).
-        """
-        knobs = getattr(job, "_proxy_knobs", None) or _current_proxy_knobs()
-        job._proxy_knobs = knobs  # type: ignore[attr-defined]
+        """Materialize proxy riêng của Reg và gắn vào transient job state."""
         url, _line = await self._resolve_proxy_for_job(job, log)
         return url
 
     def _note_proxy_failure(self, job: "Job", exc_or_msg) -> None:
-        """Mark proxy line chết nếu lỗi network → key = raw line (_active_proxy_line, F-J)."""
+        """Log network failure for the Reg-only proxy without mutating other pools."""
         line = getattr(job, "_active_proxy_line", None)
         if line and _is_proxy_network_error(exc_or_msg):
-            if get_proxy_pool().mark_dead(line):
-                self._job_log(
-                    job, f"[proxy] {_mask_proxy(line)} lỗi network — loại khỏi pool"
-                )
+            self._job_log(job, f"[proxy] Reg dedicated {_mask_proxy(line)} network error")
 
     @property
     def post_reg_get_session(self) -> bool:
@@ -723,32 +730,50 @@ class JobManager:
     def use_proxy(self) -> bool:
         return self._use_proxy
 
+    @property
+    def proxy(self) -> str | None:
+        return self._proxy
+
+    def set_proxy(self, value: str | None) -> None:
+        raw = _normalize_proxy_text(value)
+        if raw:
+            from .proxy_format import materialize_proxy
+
+            for line in _split_proxy_lines(raw):
+                materialize_proxy(line)
+            self._proxy = raw
+            self._proxy_cursor = 0
+            return
+        self._proxy = None
+        self._proxy_cursor = 0
+
     def set_use_proxy(self, value: bool) -> None:
-        """Bật/tắt áp dụng proxy pool cho job mới. Job đang chạy KHÔNG bị ảnh
-        hưởng (đã acquire proxy lúc start). Ảnh hưởng job mới + retry attempt."""
         self._use_proxy = bool(value)
 
     async def _resolve_proxy_for_job(
         self, job: "Job", log
     ) -> tuple[str | None, str | None]:
-        """Wrapper gate `_use_proxy` trước khi acquire proxy.
-
-        Tắt proxy → return (None, None), set transient fields = None để
-        runner build session direct (không proxy). Bật proxy → delegate
-        ``_resolve_job_proxy`` (probe/round_robin/random như cũ).
-
-        Set ``job._active_proxy`` (URL) + ``job._active_proxy_line`` (raw —
-        mark_dead key) ở cả 2 nhánh để `_note_proxy_failure` hoạt động đúng.
-        """
+        """Resolve duy nhất ``reg.proxy`` khi toggle của Reg đang bật."""
         if not self._use_proxy:
             job._active_proxy = None  # type: ignore[attr-defined]
             job._active_proxy_line = None  # type: ignore[attr-defined]
             if log:
                 log("[proxy] disabled — chạy direct (no proxy)")
             return None, None
-        url, line = await _resolve_job_proxy(
-            log, knobs=getattr(job, "_proxy_knobs", None)
-        )
+        if not self._proxy:
+            raise ValueError("Reg proxy is enabled but empty")
+
+        proxy_lines = _split_proxy_lines(self._proxy)
+        if not proxy_lines:
+            raise ValueError("Reg proxy is enabled but empty")
+        raw_proxy = proxy_lines[self._proxy_cursor % len(proxy_lines)]
+        self._proxy_cursor += 1
+        from .proxy_format import materialize_proxy
+
+        url = materialize_proxy(raw_proxy)
+        line = raw_proxy
+        if log:
+            log(f"[proxy] Reg dedicated: {_mask_proxy(url)}")
         job._active_proxy = url  # type: ignore[attr-defined]
         job._active_proxy_line = line  # type: ignore[attr-defined]
         return url, line
@@ -769,9 +794,12 @@ class JobManager:
             # clamp xuống thay vì bỏ qua, giữ behavior nhất quán với set_config.
             if val >= 1:
                 self._max = max(1, min(val, 2))
+        self.set_proxy(settings.get("reg.proxy"))
         if "reg.use_proxy" in settings:
-            self._use_proxy = bool(settings["reg.use_proxy"])
-        _hydrate_proxy_pool_from_settings(settings)
+            self.set_use_proxy(settings["reg.use_proxy"])
+        else:
+            # Preserve behavior for databases created before the toggle was stored.
+            self._use_proxy = self._proxy is not None
         if "reg.post_reg_get_session" in settings:
             self._post_reg_get_session = bool(settings["reg.post_reg_get_session"])
         if "reg.post_reg_get_link" in settings:
@@ -4011,7 +4039,7 @@ def _extract_plan_from_session(session_data: dict[str, Any] | None) -> str | Non
         if isinstance(pt, str) and pt.strip():
             return pt.strip().lower()
     return None
-_DEFAULT_UPI_JOB_TIMEOUT = 1800.0  # 30 phút — đủ cho 500 retries × 3s + buffer
+_DEFAULT_UPI_JOB_TIMEOUT = 0.0  # 0 = Không giới hạn (chạy cho tới khi hết approve retries)
 _DEFAULT_UPI_APPROVE_RETRIES = 500
 _DEFAULT_UPI_RESTART_THRESHOLD = 30  # consec exception trước khi restart checkout
 _DEFAULT_UPI_MAX_RESTARTS = 3        # số lần restart tối đa / job
@@ -4105,7 +4133,7 @@ class UpiJobManager:
     Multi-mode = không stagger giữa job start (theo yêu cầu UI).
     """
 
-    def __init__(self, *, max_concurrent: int = 1):
+    def __init__(self, *, max_concurrent: int = 5):
         self.jobs: dict[str, UpiJob] = {}
         self.order: list[str] = []
         self._max = max_concurrent
@@ -4114,6 +4142,8 @@ class UpiJobManager:
         self._restart_threshold = _DEFAULT_UPI_RESTART_THRESHOLD
         self._max_restarts = _DEFAULT_UPI_MAX_RESTARTS
         self._proxy_from_step = _DEFAULT_UPI_PROXY_FROM_STEP
+        self._proxy: str | None = None
+        self._use_proxy: bool = False
         self._tasks: dict[str, asyncio.Task] = {}
         self._job_queue: asyncio.Queue[str] = asyncio.Queue()
         self._workers: list[asyncio.Task] = []
@@ -4143,8 +4173,8 @@ class UpiJobManager:
         return self._job_timeout
 
     def set_job_timeout(self, seconds: float) -> None:
-        if seconds < 60 or seconds > 7200:
-            raise ValueError("job_timeout phải trong [60, 7200]")
+        if seconds != 0 and (seconds < 60 or seconds > 7200):
+            raise ValueError("job_timeout phải là 0 (không giới hạn) hoặc trong [60, 7200]")
         self._job_timeout = float(seconds)
 
     @property
@@ -4183,9 +4213,36 @@ class UpiJobManager:
             raise ValueError("proxy_from_step phải trong [1, 6]")
         self._proxy_from_step = n
 
+    @property
+    def proxy(self) -> str | None:
+        return self._proxy
+
+    @property
+    def use_proxy(self) -> bool:
+        return self._use_proxy
+
+    def set_proxy(self, value: str | None) -> None:
+        raw = _normalize_proxy_text(value)
+        if raw:
+            from .proxy_format import materialize_proxy
+
+            for line in _split_proxy_lines(raw):
+                materialize_proxy(line)
+            self._proxy = raw
+            return
+        self._proxy = None
+
+    def set_use_proxy(self, value: bool) -> None:
+        self._use_proxy = bool(value)
+
     def apply_settings(self, settings: dict) -> None:
         """Hydrate fields từ settings dict (startup boot)."""
-        _hydrate_proxy_pool_from_settings(settings)
+        self.set_proxy(settings.get("upi.proxy"))
+        if "upi.use_proxy" in settings:
+            self.set_use_proxy(settings["upi.use_proxy"])
+        else:
+            # Preserve behavior for databases created before the toggle was stored.
+            self._use_proxy = self._proxy is not None
         if "upi.max_concurrent" in settings:
             val = int(settings["upi.max_concurrent"])
             if 1 <= val <= 50:
@@ -4421,11 +4478,13 @@ class UpiJobManager:
             existing_emails.add(email.lower())
             normalized_session = dict(session_data)
             normalized_session["accessToken"] = token
+            password = session_data.get("password", "")
+            secret = session_data.get("secret") or session_data.get("2fa")
             job = UpiJob(
                 id=jid,
                 email=email,
-                password="",
-                secret=None,
+                password=password,
+                secret=secret,
                 _access_token=token,
                 _session_data=normalized_session,
             )
@@ -4857,31 +4916,15 @@ class UpiJobManager:
             def log(msg: str) -> None:
                 self._job_log(job, msg)
 
-            # UPI Step1 login luôn DIRECT (không qua proxy) — quyết định kiến
-            # trúc: login direct giảm captcha trên ChatGPT auth; proxy chỉ
-            # apply từ Step ``upi.proxy_from_step`` (default 3 — checkout).
-            # raw_pool (templates) dùng cho approve lazy-materialize-per-batch
-            # + giữ len>1 cho _proxy_advance_enabled. Hot-load: user vừa cập
-            # nhật là dùng ngay.
-            raw_pool = list(get_proxy_pool().live_entries())
-            # Debug log: nếu pool rỗng, log lý do — giúp user phân biệt giữa
-            # "chưa cấu hình proxy" vs "proxy bị mark_dead". Mask cả raw line
-            # để không leak credentials.
-            _pool_status = get_proxy_pool().status()
-            self._job_log(
-                job,
-                f"[proxy] pool status: total={_pool_status.get('total')} "
-                f"live={_pool_status.get('live')} dead={len(_pool_status.get('dead', []))} "
-                f"mode={_pool_status.get('mode')!r}",
-            )
-            if not raw_pool:
-                self._job_log(
-                    job,
-                    "[proxy] WARNING — live entries rỗng → flow sẽ chạy DIRECT toàn bộ. "
-                    "Check Settings tab > Proxy Pool: (1) đã Save proxy chưa? "
-                    "(2) format đúng host:port[:user[:pass]] chưa? "
-                    "(3) proxy có bị mark_dead trong run trước không (Reset Dead)?",
-                )
+            # UPI chỉ dùng proxy riêng của tab. proxy_from_step quyết định bước
+            # bắt đầu áp proxy; toggle tắt thì toàn bộ flow chạy direct.
+            if self._use_proxy and not self._proxy:
+                raise ValueError("UPI proxy is enabled but empty")
+            raw_pool = _split_proxy_lines(self._proxy) if self._use_proxy else []
+            if raw_pool:
+                self._job_log(job, f"[proxy] UPI dedicated: {len(raw_pool)} line(s), first {_mask_proxy(raw_pool[0])}")
+            else:
+                self._job_log(job, "[proxy] UPI disabled — running direct")
             # _active_proxy = first proxy materialized (= IP token-export
             # replay cho entitlement-check). first_proxy lấy ở runner —
             # ở đây chỉ cần record raw line đầu cho mark_dead.
@@ -4891,6 +4934,7 @@ class UpiJobManager:
             _UPI_QR_DIR.mkdir(parents=True, exist_ok=True)
             qr_out_path = _UPI_QR_DIR / f"{job.id}.png"
 
+            timeout_val = self._job_timeout if self._job_timeout > 0 else None
             result: UpiQrResult = await asyncio.wait_for(
                 run_upi_qr_probe(
                     email=job.email,
@@ -4906,7 +4950,7 @@ class UpiJobManager:
                     session_data_override=job._session_data,
                     auth_sink=auth_sink,
                 ),
-                timeout=self._job_timeout,
+                timeout=timeout_val,
             )
 
             # Apply result vào job state.
@@ -4957,7 +5001,7 @@ class UpiJobManager:
 
             if result.ok:
                 job.status = "success"
-                job.error = None
+                job.error = result.error
             else:
                 job.status = "error"
                 job.error = result.error or "unknown error"
@@ -5009,12 +5053,11 @@ class UpiJobManager:
             self._broadcast_job(job)
         except Exception as exc:
             error_msg = f"{type(exc).__name__}: {exc}"
-            # Mark proxy chết nếu lỗi network — key = raw line login đã dùng (F-J),
-            # KHÔNG live_entries()[0] (có thể không phải proxy login thực tế).
+            # Proxy riêng không mutate pool toàn cục; giữ nguyên để user sửa/retry.
             if _is_proxy_network_error(exc):
                 line = getattr(job, "_active_proxy_line", None)
-                if line and get_proxy_pool().mark_dead(line):
-                    self._job_log(job, f"[proxy] {_mask_proxy(line)} lỗi network — loại khỏi pool")
+                if line:
+                    self._job_log(job, f"[proxy] UPI dedicated {_mask_proxy(line)} network error")
             job.status = "error"
             job.error = error_msg
             job.finished_at = time.time()
@@ -5088,5 +5131,5 @@ _upi_manager: UpiJobManager | None = None
 def get_upi_manager() -> UpiJobManager:
     global _upi_manager
     if _upi_manager is None:
-        _upi_manager = UpiJobManager(max_concurrent=1)
+        _upi_manager = UpiJobManager(max_concurrent=5)
     return _upi_manager

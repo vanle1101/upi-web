@@ -87,7 +87,7 @@ PROXY_FROM_STEP: int = 3
 DO_CONFIRM: bool = True
 DO_APPROVE: bool = True
 APPROVE_DELAY: float = 3.0
-APPROVE_PROXY_BATCH: int = 3
+APPROVE_PROXY_BATCH: int = 1
 # Số lần `result=exception http=200` LIÊN TIẾP để fatal-break approve loop.
 # Default = 0 → DISABLED: backend_exception KHÔNG bao giờ làm dừng sớm; loop
 # chỉ dừng khi `approved=True` hoặc hết `approve_retries` user cấu hình.
@@ -198,6 +198,7 @@ _MATCH_TERMS = (
     "vpa",
     "next_action",
     "hosted_instructions",
+    "instructions",
     "image_url",
     "display_qr",
 )
@@ -238,6 +239,30 @@ def _proxy_for_step(proxy: str | None, *, from_step: int, step: int) -> dict[str
     if proxy and step >= from_step:
         return _proxy_dict(proxy)
     return None
+
+
+def _get_proxy_pool() -> Any:
+    try:
+        from .proxy_pool import get_proxy_pool
+        return get_proxy_pool()
+    except ImportError:
+        try:
+            from web.proxy_pool import get_proxy_pool
+            return get_proxy_pool()
+        except ImportError:
+            from proxy_pool import get_proxy_pool
+            return get_proxy_pool()
+
+
+def _check_proxy_network_error(exc: Exception) -> bool:
+    try:
+        from .manager import _is_proxy_network_error
+    except ImportError:
+        try:
+            from web.manager import _is_proxy_network_error
+        except ImportError:
+            from manager import _is_proxy_network_error
+    return _is_proxy_network_error(exc)
 
 
 def _proxy_url_for_retry(
@@ -316,6 +341,14 @@ def _find_qr_image_url(matches: list[dict[str, Any]]) -> str | None:
             and "qr" in path
             and (value.endswith(".png") or value.endswith(".svg") or "qr" in value.lower())
         ):
+            return value
+    return None
+
+
+def _find_hosted_instructions_url(matches: list[dict[str, Any]]) -> str | None:
+    for match in matches:
+        value = match.get("value")
+        if isinstance(value, str) and "payments.stripe.com/upi/instructions" in value.lower():
             return value
     return None
 
@@ -1647,6 +1680,13 @@ async def run_upi_qr_probe(
             phase_tag = f" [p{phase_idx}]" if restart_enabled else ""
             triggered_restart = False  # reset per-phase
 
+            raw_first_proxy = _proxy_url_for_retry(
+                proxy_pool, from_step=proxy_from_step, step=2, 
+                attempt=phase_idx, per_proxy_attempts=1
+            )
+            first_proxy = _safe_materialize(raw_first_proxy) if raw_first_proxy else None
+            masked_first_proxy = _mask_proxy(first_proxy)
+
             if restart_count > 0:
                 _safe_log(_fmt_step(
                     "upi", "restart", "info",
@@ -1661,8 +1701,21 @@ async def run_upi_qr_probe(
                     proxies=_proxy_dict(first_proxy if proxy_from_step <= 2 else None),
                 )
             except Exception as exc:  # noqa: BLE001
-                # Phase 1 fail → propagate (giữ behavior cũ là raise).
-                # Phase >1 fail → fatal restart, không retry tiếp.
+                if "already paid" in str(exc).lower():
+                    approved = True
+                    final_approved = True
+                    fatal_approve_error = "PAID"
+                    _safe_log(_fmt_step(f"2/6{phase_tag}", "checkout", "ok", "User is already paid (PAID)"))
+                    break
+
+                if restart_enabled and restart_count < max_restarts:
+                    _safe_log(_fmt_step(f"2/6{phase_tag}", "checkout", "warn", f"proxy/network error → restart phase: {str(exc)[:100]}"))
+                    if _check_proxy_network_error(exc) and raw_first_proxy:
+                        _get_proxy_pool().mark_dead(raw_first_proxy)
+                        if raw_first_proxy in proxy_pool:
+                            proxy_pool.remove(raw_first_proxy)
+                    restart_count += 1
+                    continue
                 if restart_count == 0:
                     raise
                 fatal_approve_error = (
@@ -1692,6 +1745,14 @@ async def run_upi_qr_probe(
                     proxies=_proxy_for_step(first_proxy, from_step=proxy_from_step, step=3),
                 )
             except Exception as exc:  # noqa: BLE001
+                if restart_enabled and restart_count < max_restarts:
+                    _safe_log(_fmt_step(f"3/6{phase_tag}", "init", "warn", f"proxy/network error → restart phase: {str(exc)[:100]}"))
+                    if _check_proxy_network_error(exc) and raw_first_proxy:
+                        _get_proxy_pool().mark_dead(raw_first_proxy)
+                        if raw_first_proxy in proxy_pool:
+                            proxy_pool.remove(raw_first_proxy)
+                    restart_count += 1
+                    continue
                 if restart_count == 0:
                     raise
                 fatal_approve_error = (
@@ -1707,13 +1768,13 @@ async def run_upi_qr_probe(
                 f"amount={amount}  ppage={_short(init_data.get('id') or '', 12)}",
             ))
             if PROMO and amount > 0:
-                _safe_log(_fmt_step("upi", "no free offer", "fail",
-                                    f"amount={amount} (promo bật nhưng > 0)"))
+                _safe_log(_fmt_step("upi", "no free offer", "success",
+                                    f"amount={amount} (đã thanh toán / no free offer)"))
                 if restart_count == 0:
                     return UpiQrResult(
                         ok=False, email=masked_email, amount=amount, return_url=return_url,
                         checkout_session=str(session_id)[:18] + "...",
-                        error="no free offer (promo enabled but amount > 0)",
+                        error="PAID", # Use "PAID" as error field so UI renders the green PAID badge
                         elapsed_seconds=monotonic() - started,
                     )
                 fatal_approve_error = (
@@ -1733,6 +1794,14 @@ async def run_upi_qr_probe(
                     proxies=_proxy_for_step(first_proxy, from_step=proxy_from_step, step=4),
                 )
             except Exception as exc:  # noqa: BLE001
+                if restart_enabled and restart_count < max_restarts:
+                    _safe_log(_fmt_step(f"4/6{phase_tag}", "elements", "warn", f"proxy/network error → restart phase: {str(exc)[:100]}"))
+                    if _check_proxy_network_error(exc) and raw_first_proxy:
+                        _get_proxy_pool().mark_dead(raw_first_proxy)
+                        if raw_first_proxy in proxy_pool:
+                            proxy_pool.remove(raw_first_proxy)
+                    restart_count += 1
+                    continue
                 if restart_count == 0:
                     raise
                 fatal_approve_error = (
@@ -1925,6 +1994,19 @@ async def run_upi_qr_probe(
                         ok_recover = await _wait_network_recovery(sess, _safe_log)
                         if ok_recover:
                             consecutive_network_error = 0
+                            
+                            if raw_approve_proxy:
+                                _safe_log(_fmt_step(
+                                    "net", "proxy-dead", "warn",
+                                    f"proxy {_mask_proxy(raw_approve_proxy)} lỗi mạng liên tục → đánh dấu chết"
+                                ))
+                                _get_proxy_pool().mark_dead(raw_approve_proxy)
+                                if raw_approve_proxy in proxy_pool:
+                                    proxy_pool.remove(raw_approve_proxy)
+                                
+                                if batch_idx in _approve_mat_cache:
+                                    del _approve_mat_cache[batch_idx]
+
                             # Resume approve loop ở attempt kế (KHÔNG đốt thêm
                             # budget trong lúc đợi). Skip sleep cuối loop.
                             continue
@@ -2072,6 +2154,9 @@ async def run_upi_qr_probe(
         upi_uri = _find_upi_uri(matches)
         qr_image_url = _find_qr_image_url(matches)
         qr_expires_at = _find_qr_expires_at(matches)
+        instructions_url = _find_hosted_instructions_url(matches)
+        if instructions_url:
+            return_url = instructions_url
 
         # QR rendering (download Stripe image hoặc render từ upi:// URI).
         qr_path: str | None = None
@@ -2103,9 +2188,10 @@ async def run_upi_qr_probe(
         # Best-effort: lỗi overlay log riêng, KHÔNG bỏ qr_path — QR raw vẫn dùng
         # được. Path canonical đã ghi đè in-place, nên Telegram + web modal +
         # clipboard tự động dùng ảnh đã có watermark.
-        if qr_path:
+        if qr_path and email:
             try:
-                _overlay_email_on_qr(Path(qr_path), email)
+                pass
+                # _overlay_email_on_qr(Path(qr_path), email)
             except Exception as exc:  # noqa: BLE001
                 _safe_log(_fmt_step(
                     "qr", "overlay", "fail",
@@ -2126,21 +2212,24 @@ async def run_upi_qr_probe(
 
     # Determine success: cần CẢ approve approved + qr file rendered.
     # Ưu tiên error: fatal (consec be_excpt threshold) > confirm fail > approve fail > qr fail.
-    if fatal_approve_error:
-        error_msg = fatal_approve_error
-    elif not final_confirmed:
-        error_msg = "confirm thất bại với mọi variant"
-    elif not final_approved:
-        error_msg = (
-            f"approve/thanh toán không thành công sau {len(approve_attempts)} lượt "
-            f"(Approve retries={approve_retries}, không phải login attempts)"
-        )
-    elif not qr_path:
-        error_msg = qr_reason or "no QR generated"
+    if fatal_approve_error == "PAID":
+        error_msg = "PAID"
+        ok = False  # Force ok=False so UI shows status-error but keeps the green PAID badge via j.error="PAID"
     else:
-        error_msg = None
-
-    ok = error_msg is None
+        if fatal_approve_error:
+            error_msg = fatal_approve_error
+        elif not final_confirmed:
+            error_msg = "confirm thất bại với mọi variant"
+        elif not final_approved:
+            error_msg = (
+                f"approve/thanh toán không thành công sau {len(approve_attempts)} lượt "
+                f"(Approve retries={approve_retries}, không phải login attempts)"
+            )
+        elif not qr_path:
+            error_msg = qr_reason or "no QR generated"
+        else:
+            error_msg = None
+        ok = error_msg is None
     _safe_log(_fmt_step(
         "upi", "done", "ok" if ok else "fail",
         (f"qr={'yes' if qr_path else 'no'}  approved={'yes' if final_approved else 'no'}  "

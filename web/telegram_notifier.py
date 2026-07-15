@@ -51,12 +51,15 @@ def _fmt_amount(amount: int) -> str:
 
 
 def _fmt_expiry(expires_at: int | None) -> str:
-    """Format hết hạn theo giờ VN + IN, mỗi múi 1 dòng. None → 'không xác định'."""
+    """Format hết hạn theo giờ VN + thời gian còn lại."""
     if not expires_at:
         return "Hết hạn: không xác định"
-    vn = datetime.fromtimestamp(expires_at, _TZ_VN).strftime(_TIME_FMT)
-    inn = datetime.fromtimestamp(expires_at, _TZ_IN).strftime(_TIME_FMT)
-    return f"Hết hạn: {vn} VN\nExpired: {inn} IN"
+    vn = datetime.fromtimestamp(expires_at, _TZ_VN).strftime("%d/%m/%Y %H:%M")
+    now = datetime.now(_TZ_VN).timestamp()
+    left = int((expires_at - now) / 60)
+    if left < 0:
+        left = 0
+    return f"Hết hạn: {vn} (UTC+7) · in {left}m"
 
 
 def _mask_email(email: str | None) -> str:
@@ -218,23 +221,17 @@ class TelegramNotifier:
             return False
 
         is_svg = path.suffix.lower() == ".svg"
-        # Caption gọn: tiêu đề + email masked + 2 dòng hết hạn (VN/IN). Bỏ
-        # amount/checkout — combo đầy đủ ở tin reply (code block tap-to-copy).
-        caption = "\n".join([
-            "🟢 <b>UPI QR — ChatGPT Plus (IN)</b>",
-            f"Email: {html.escape(_mask_email(email))}",
-            _fmt_expiry(qr_expires_at),
-        ])
-
-        # ─── DISABLED: combo reply ─────────────────────────────────────────
-        # Hiện tại không gửi tin reply chứa `email|password|secret` (spam channel
-        # + đã có Output pane trên web UI để copy). Giữ code dạng comment để
-        # bật lại sau bằng cách uncomment block này + block sendMessage bên dưới.
-        # combo = f"{email}|{password}|{secret or ''}"
-        # # Vừa spoiler vừa code: ẩn sau lớp spoiler, tap mở ra là code block
-        # # với nút Copy (monospace). Telegram cho phép lồng <tg-spoiler> + <pre>.
-        # reply_text = f"<tg-spoiler><pre>{html.escape(combo)}</pre></tg-spoiler>"
-        # ──────────────────────────────────────────────────────────────────
+        parts = [email]
+        if password: parts.append(password)
+        if secret: parts.append(secret)
+        
+        caption_lines = [
+            "✅ <b>UPI QR</b>",
+            f"Email: <code>{html.escape('|'.join(parts))}</code>",
+            _fmt_expiry(qr_expires_at)
+        ]
+        
+        caption = "\n".join(caption_lines)
 
         from curl_cffi import CurlMime
         from curl_cffi.requests import AsyncSession
@@ -244,8 +241,6 @@ class TelegramNotifier:
         method = "sendDocument" if is_svg else "sendPhoto"
         mime_type = "image/svg+xml" if is_svg else "image/png"
 
-        # Build multipart: tất cả text fields PHẢI gắn vào CurlMime cùng file
-        # vì curl_cffi không cho dùng đồng thời data= + multipart=.
         mp = CurlMime()
         mp.addpart(name="chat_id", data=str(self._chat_id).encode("utf-8"))
         mp.addpart(name="caption", data=caption.encode("utf-8"))
@@ -259,27 +254,25 @@ class TelegramNotifier:
 
         async with AsyncSession() as sess:
             try:
-                media_payload = await self._call(sess, method, data={}, multipart=mp)
+                resp_payload = await self._call(sess, method, data={}, multipart=mp)
             finally:
                 mp.close()
-            # ─── DISABLED: combo reply (uncomment để bật lại) ──────────────
-            # message_id = (
-            #     media_payload.get("result", {}).get("message_id")
-            #     if isinstance(media_payload.get("result"), dict) else None
-            # )
-            # reply_data: dict[str, Any] = {
-            #     "chat_id": self._chat_id,
-            #     "text": reply_text,
-            #     "parse_mode": "HTML",
-            # }
-            # if message_id is not None:
-            #     reply_data["reply_to_message_id"] = message_id
-            # await self._call(sess, "sendMessage", data=reply_data)
-            # ──────────────────────────────────────────────────────────────
-            del media_payload  # currently unused — giữ block fetch để keep
-            # parity nếu uncomment reply ở trên.
 
-        _log(_tg_line("sent", "✓", "QR only (combo reply disabled)"))
+            if return_url:
+                message_id = resp_payload.get("result", {}).get("message_id")
+                if message_id:
+                    reply_text = f"💳 <b>Link thanh toán:</b>\n{html.escape(return_url)}"
+                    await self._call(
+                        sess, "sendMessage",
+                        data={
+                            "chat_id": self._chat_id,
+                            "text": reply_text,
+                            "parse_mode": "HTML",
+                            "reply_to_message_id": message_id,
+                        }
+                    )
+
+        _log(_tg_line("sent", "✓", "QR and link as reply"))
         return True
 
 

@@ -22,11 +22,11 @@ from .proxy_format import has_template, mask_proxy, materialize_proxy
 # Default 6 knob (canonical) — .env (config.proxy_env_defaults) + Settings store
 # (UI) override per-knob qua _load_proxy_knobs.
 _DEFAULT_KNOBS: dict[str, object] = {
-    "probe_endpoint": "https://api64.ipify.org",
-    "probe_timeout": 6,
+    "probe_endpoint": "https://cloudflare.com/cdn-cgi/trace",
+    "probe_timeout": 12,
     "max_tries": 5,
     "sid_len": 8,
-    "sid_retry_per_line": 2,
+    "sid_retry_per_line": 4,
     "probe_concurrency": 4,
 }
 
