@@ -421,7 +421,7 @@ body.dark-theme .step.is-done span {
 /* =========================================================
    KPI CARDS
    ========================================================= */
-.kpi-cards {
+.kpi-cards, .metric-strip {
   display: flex;
   gap: 14px;
 }
@@ -866,3 +866,4 @@ body.dark-theme .btn-primary {
 .background-pattern, .noise-overlay, .grid-overlay, body::before {
   pointer-events: none !important;
 }
+

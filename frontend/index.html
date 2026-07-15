@@ -27,30 +27,35 @@
     
     <nav class="sidebar-nav">
       <button type="button" class="sidebar-nav-item active" data-tab="tab-reg">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></span>
         <div class="nav-text">
           <span class="nav-title">Reg</span>
           <span class="nav-subtitle">Provision accounts</span>
         </div>
       </button>
       <button type="button" class="sidebar-nav-item" data-tab="tab-session">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></span>
         <div class="nav-text">
           <span class="nav-title">Get Session</span>
           <span class="nav-subtitle">Capture auth state</span>
         </div>
       </button>
       <button type="button" class="sidebar-nav-item" data-tab="tab-upi">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></span>
         <div class="nav-text">
           <span class="nav-title">UPI QR</span>
           <span class="nav-subtitle">Payment issuance</span>
         </div>
       </button>
       <button type="button" class="sidebar-nav-item" data-tab="tab-getacc">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></span>
         <div class="nav-text">
           <span class="nav-title">Get Acc</span>
           <span class="nav-subtitle">Extract credentials</span>
         </div>
       </button>
       <button type="button" class="sidebar-nav-item" data-tab="tab-settings">
+        <span class="nav-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg></span>
         <div class="nav-text">
           <span class="nav-title">Settings</span>
           <span class="nav-subtitle">Runtime controls</span>
@@ -96,12 +101,10 @@
         <span class="toggle-label">Debug</span>
       </label>
     </div>
-    
-  <!-- TABS WILL GO HERE -->
 <main class='tab-content dashboard-layout active' id='tab-reg' style='display:grid;'>
     <header class="page-header">
       <div class="header-titles">
-        <span class="eyebrow">Cấp phát tài khoản</span>
+        <span class="eyebrow">Operations Desk</span>
         <h1>Registration desk</h1>
         <p>Prepare identities, monitor browser work and review MFA results from one queue.</p>
       </div>
@@ -159,35 +162,175 @@
     <section class="workspace">
       <!-- LEFT COL: CONFIG -->
       <div class="left-col panel">
-        <div class="panel-header">Tài khoản nguồn</div>
-        
+        <aside class="control-rail">
+<section class="card card-input control-surface">
+<header class="card-head">
+<h2 data-i18n="reg_source_accounts">Source accounts</h2>
+<span class="muted card-head-note" data-i18n="reg_input_hint" id="input-hint">One combo per line: email|password|refresh_token|client_id</span>
+</header>
+<!-- Mail Mode + Worker config: 1 row, label trên / control dưới -->
+<div class="mail-mode-row">
+<label class="input-group config-field-mode">
+<span class="input-label" data-i18n="reg_mail_mode">Mail Mode</span>
+<select id="mail-mode-select"></select>
+</label>
+<label class="input-group config-field-mode">
+<span class="input-label" data-i18n="reg_reg_mode">Reg Mode</span>
+<select id="reg-mode-select">
+<option value="browser">Browser (anti-detect)</option>
+<option value="pure_request">Pure Request (HTTP only)</option>
+</select>
+</label>
+<div class="mail-mode-config-host" id="mail-mode-config-host"></div>
+</div>
+<textarea class="combo-textarea" id="combo-input" placeholder="email1@hotmail.com|pwd1|M.C548...|9e5f94bc-...
+email2@outlook.com|pwd2|M.C525...|9e5f94bc-..."></textarea>
+<div class="card-settings">
+<div class="card-settings-row card-settings-row-mixed">
+<label class="input-group config-field-long">
+<span class="input-label" data-i18n="reg_default_password">Default password</span>
+<input autocomplete="off" data-i18n-placeholder="reg_default_password" id="default-password" placeholder="Leave blank for random" spellcheck="false" type="text"/>
+</label>
+<label class="toggle-wrap" title="Bật/tắt áp dụng proxy pool cho Reg jobs. Tắt = chạy direct (no proxy).">
+<input checked="" id="proxy-toggle" type="checkbox"/>
+<span class="toggle-track"><span class="toggle-thumb"></span></span>
+<span class="toggle-label" data-i18n="reg_use_proxy">Proxy</span>
+</label>
+<label class="input-group config-field-short">
+<span class="input-label" data-i18n="reg_timeout">Timeout (s/job)</span>
+<input id="job-timeout" max="600" min="30" step="10" type="number" value="240"/>
+</label>
+</div>
+<div class="workflow-proxy-row">
+<div class="input-group workflow-proxy-field">
+<div class="workflow-proxy-heading">
+<label class="input-label" for="reg-proxy-input">Reg proxy <small>Only for Registration</small></label>
+<span class="workflow-proxy-note">Use the Proxy switch above to enable</span>
+</div>
+<textarea autocomplete="off" class="proxy-textarea" id="reg-proxy-input" placeholder="host:port:user:pass
+host2:port:user:pass (blank = direct)" rows="3" spellcheck="false"></textarea>
+</div>
+</div>
+</div>
+<div class="card-actions">
+<button class="btn btn-primary" data-i18n="reg_start" id="btn-run">Start registration</button>
+<button class="btn btn-danger" data-i18n="reg_stop" id="btn-stop-all">Stop All</button>
+<button class="btn btn-ghost" data-i18n="reg_clear" id="btn-clear-input">Clear Input</button>
+<span class="muted" data-i18n="reg_combos_count" id="combo-count">0 combos</span>
+</div>
+</section>
+</aside>
       </div>
 
       <!-- CENTER COL: QUEUE -->
       <div class="center-col panel">
-        <div class="panel-header">
-          <div class="panel-title">Execution queue</div>
-        </div>
-        <div class="queue-container">
-          None
-        </div>
+        <section class="card card-jobs jobs-surface">
+<header class="card-head">
+<div class="panel-title-group">
+<h2 data-i18n="reg_queue_title">Execution queue</h2>
+<span class="panel-subtitle" data-i18n="reg_queue_desc">Live registration activity</span>
+</div>
+<div class="card-head-actions">
+<label class="input-group config-field-tiny" title="Số lần retry khi job bị error (0 = không retry)">
+<span class="input-label">Retry</span>
+<input id="auto-retry-max" max="10" min="0" step="1" type="number" value="0"/>
+</label>
+<button class="btn btn-ghost btn-small" data-i18n="reg_retry_failed" id="btn-retry-failed" title="Retry all error &amp; cancelled jobs">Retry Failed</button>
+<button class="btn btn-ghost btn-small" data-i18n="reg_clear_done" id="btn-clear-done" title="Remove finished jobs from memory">Clear Done</button>
+<button class="btn btn-ghost btn-small" data-i18n="reg_clear_all" id="btn-clear-all" title="Remove ALL jobs (all statuses)">Clear All</button>
+<span class="muted" id="job-summary">0 total</span>
+</div>
+</header>
+<div class="job-list" id="job-list">
+<div class="empty" data-i18n="reg_no_jobs">No jobs yet. Paste combos and click Run.</div>
+</div>
+</section>
       </div>
 
       <!-- RIGHT COL: LIVE OVERVIEW -->
       <div class="right-col panel">
-        <div class="panel-header">Live overview <span class="live-indicator">Live</span></div>
-        
+        <aside aria-label="Registration insights" class="insights-rail ops-live-rail">
+<section class="insight-card live-overview-card">
+<header class="live-overview-head">
+<span class="live-overview-title"><span aria-hidden="true" class="live-overview-icon"></span>Live Overview</span>
+<span class="live-badge">Live</span>
+</header>
+<div class="live-overview-stats">
+<div><strong id="reg-rail-success">0</strong><span>Success</span></div>
+<div><strong id="reg-rail-running">0</strong><span>Running</span></div>
+<div class="is-error"><strong id="reg-rail-errors">0</strong><span>Errors</span></div>
+</div>
+<div class="rail-chart-head">
+<strong>Jobs / Min</strong>
+<span>Last 30m</span>
+</div>
+<div aria-label="Realtime registration throughput chart" class="live-chart ops-realtime-chart rail-live-chart" data-chart-value-id="insight-jobs-min" id="reg-realtime-chart"></div>
+<div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
+<div class="rail-block health-card">
+<header class="rail-block-head">System Health</header>
+<div class="health-row"><span>Runtime</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Network</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Proxies</span><strong>Healthy</strong></div>
+<div class="health-row"><span>API Endpoints</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Disk Space</span><strong>Healthy</strong></div>
+</div>
+<div class="rail-block quick-card">
+<header class="rail-block-head">Quick Actions</header>
+<div class="quick-grid">
+<button class="btn btn-ghost btn-small" type="button">Export Success</button>
+<button class="btn btn-ghost btn-small" type="button">Export Errors</button>
+<button class="btn btn-ghost btn-small" type="button">View QR Output</button>
+<button class="btn btn-ghost btn-small" type="button">Webhook Logs</button>
+</div>
+</div>
+<span class="rail-hidden-metric" id="insight-jobs-min">0.0</span>
+<span class="rail-hidden-metric" id="insight-success-rate">0%</span>
+<span class="rail-hidden-metric" id="insight-error-rate">0%</span>
+</section>
+</aside>
       </div>
     </section>
 
     <!-- RUNTIME LOG -->
     <section class="runtime-log panel">
-      
+      <section class="diagnostics-dock is-collapsed" data-dock="reg">
+<header class="dock-bar">
+<div aria-label="Registration diagnostics" class="dock-tabs" role="tablist">
+<button aria-selected="true" class="dock-tab active" data-dock-target="reg-log" data-i18n="reg_tab_runtime" role="tab" type="button">Runtime</button>
+<button aria-selected="false" class="dock-tab" data-dock-target="reg-success" data-i18n="reg_tab_success" role="tab" type="button">Success</button>
+<button aria-selected="false" class="dock-tab" data-dock-target="reg-error" data-i18n="reg_tab_errors" role="tab" type="button">Errors</button>
+</div>
+<div class="dock-context">
+<span class="dock-target" id="log-target">No job selected</span>
+<button class="btn btn-ghost btn-small" data-i18n="clear_log" id="btn-clear-log" title="Clear log viewer">Clear log</button>
+<button aria-expanded="false" class="dock-collapse" data-dock-collapse="" data-i18n="show_details" type="button">Show details</button>
+</div>
+</header>
+<div class="dock-panels">
+<section class="dock-panel active card card-log" data-dock-panel="reg-log" role="tabpanel">
+<pre class="log-pane" id="log-pane"></pre>
+</section>
+<section class="dock-panel card card-success" data-dock-panel="reg-success" hidden="" role="tabpanel">
+<header class="dock-panel-head">
+<span data-i18n="reg_success_head">Completed account output</span>
+<button class="btn btn-ghost btn-small" data-i18n="copy_all" id="btn-copy-success">Copy all</button>
+</header>
+<pre class="output-pane" id="success-pane">Format: email|password|secret_2fa</pre>
+</section>
+<section class="dock-panel card card-error" data-dock-panel="reg-error" hidden="" role="tabpanel">
+<header class="dock-panel-head">
+<span data-i18n="reg_error_head">Failed account output</span>
+<button class="btn btn-ghost btn-small" data-i18n="copy_all" id="btn-copy-error">Copy all</button>
+</header>
+<pre class="output-pane" id="error-pane">No errors yet.</pre>
+</section>
+</div>
+</section>
     </section>
     </main><main class='tab-content dashboard-layout ' id='tab-session' style='display:none;'>
     <header class="page-header">
       <div class="header-titles">
-        <span class="eyebrow">Cấp phát tài khoản</span>
+        <span class="eyebrow">Operations Desk</span>
         <h1>Session capture</h1>
         <p>Resolve account credentials into current session payloads with visible job-level diagnostics.</p>
       </div>
@@ -208,35 +351,125 @@
     <section class="workspace">
       <!-- LEFT COL: CONFIG -->
       <div class="left-col panel">
-        <div class="panel-header">Tài khoản nguồn</div>
-        
+        <aside class="control-rail">
+<section class="card card-input control-surface">
+<header class="card-head">
+<div class="panel-title-group">
+<h2 data-i18n="ses_credentials">Credentials</h2>
+<span class="panel-subtitle">email | password | secret</span>
+</div>
+</header>
+<textarea class="combo-textarea" id="ses-combo-input" placeholder="email@hotmail.com|password123|DNPARKKMM5EYOPDG...
+email2@hotmail.com|pass456|I77PEBZQNEBE67SU..."></textarea>
+<div class="card-settings">
+<label class="input-group settings-field-compact">
+<span class="input-label" data-i18n="reg_timeout">Timeout (s/job)</span>
+<input id="ses-job-timeout" max="600" min="30" step="10" type="number" value="120"/>
+</label>
+</div>
+<div class="card-actions">
+<button class="btn btn-primary" data-i18n="ses_start" id="ses-btn-run">Get Session</button>
+<button class="btn btn-danger" data-i18n="reg_stop" id="ses-btn-stop-all">Stop All</button>
+<button class="btn btn-ghost" data-i18n="reg_clear" id="ses-btn-clear-input">Clear Input</button>
+<span class="muted" data-i18n="reg_combos_count" id="ses-combo-count">0 combos</span>
+</div>
+</section>
+</aside>
       </div>
 
       <!-- CENTER COL: QUEUE -->
       <div class="center-col panel">
-        <div class="panel-header">
-          <div class="panel-title">Execution queue</div>
-        </div>
-        <div class="queue-container">
-          None
-        </div>
+        <section class="card card-jobs jobs-surface">
+<header class="card-head">
+<div class="panel-title-group">
+<h2 data-i18n="ses_queue_title">Session queue</h2>
+<span class="panel-subtitle" data-i18n="ses_queue_desc">Authentication and capture status</span>
+</div>
+<div class="card-head-actions">
+<button class="btn btn-ghost btn-small" data-i18n="reg_clear_done" id="ses-btn-clear-done">Clear Done</button>
+<span class="muted" id="ses-job-summary">0 total</span>
+</div>
+</header>
+<div class="job-list" id="ses-job-list">
+<div class="empty" data-i18n="ses_no_jobs">Paste combos and click Get Session.</div>
+</div>
+</section>
       </div>
 
       <!-- RIGHT COL: LIVE OVERVIEW -->
       <div class="right-col panel">
-        <div class="panel-header">Live overview <span class="live-indicator">Live</span></div>
-        
+        <aside aria-label="Session insights" class="insights-rail tab-chart-rail ops-live-rail">
+<section class="insight-card live-overview-card">
+<header class="live-overview-head">
+<span class="live-overview-title"><span aria-hidden="true" class="live-overview-icon"></span>Live Overview</span>
+<span class="live-badge">Live</span>
+</header>
+<div class="live-overview-stats">
+<div><strong id="session-rail-success">0</strong><span>Success</span></div>
+<div><strong id="session-chart-running">0</strong><span>Running</span></div>
+<div class="is-error"><strong id="session-chart-errors">0</strong><span>Errors</span></div>
+</div>
+<div class="rail-chart-head">
+<strong>Session Success</strong>
+<span>Last 30m</span>
+</div>
+<div aria-label="Realtime session success chart" class="live-chart ops-realtime-chart rail-live-chart" data-chart-value-id="session-chart-value" id="session-realtime-chart"></div>
+<div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
+<div class="rail-block health-card">
+<header class="rail-block-head">System Health</header>
+<div class="health-row"><span>Runtime</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Auth Flow</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Browser</span><strong>Healthy</strong></div>
+<div class="health-row"><span>API Endpoints</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Storage</span><strong>Healthy</strong></div>
+</div>
+<div class="rail-block quick-card">
+<header class="rail-block-head">Quick Actions</header>
+<div class="quick-grid">
+<button class="btn btn-ghost btn-small" type="button">Export Success</button>
+<button class="btn btn-ghost btn-small" type="button">Export Errors</button>
+<button class="btn btn-ghost btn-small" type="button">View Sessions</button>
+<button class="btn btn-ghost btn-small" type="button">Webhook Logs</button>
+</div>
+</div>
+<span class="rail-hidden-metric" id="session-chart-value">0%</span>
+</section>
+</aside>
       </div>
     </section>
 
     <!-- RUNTIME LOG -->
     <section class="runtime-log panel">
-      
+      <section class="diagnostics-dock is-collapsed" data-dock="session">
+<header class="dock-bar">
+<div aria-label="Session diagnostics" class="dock-tabs" role="tablist">
+<button aria-selected="true" class="dock-tab active" data-dock-target="session-log" data-i18n="reg_tab_runtime" role="tab" type="button">Runtime</button>
+<button aria-selected="false" class="dock-tab" data-dock-target="session-error" data-i18n="reg_tab_errors" role="tab" type="button">Errors</button>
+</div>
+<div class="dock-context">
+<span class="dock-target" id="ses-log-target">No job selected</span>
+<button class="btn btn-ghost btn-small" data-i18n="clear_log" id="ses-btn-clear-log" title="Clear log viewer">Clear log</button>
+<button aria-expanded="false" class="dock-collapse" data-dock-collapse="" data-i18n="show_details" type="button">Show details</button>
+</div>
+</header>
+<div class="dock-panels">
+<section class="dock-panel active card card-log" data-dock-panel="session-log" role="tabpanel">
+<pre class="log-pane" id="ses-log-pane"></pre>
+</section>
+<section class="dock-panel card card-error" data-dock-panel="session-error" hidden="" role="tabpanel">
+<header class="dock-panel-head">
+<span data-i18n="ses_errors_head">Session capture failures</span>
+<button class="btn btn-ghost btn-small" data-i18n="copy_all" id="ses-btn-copy-error">Copy all</button>
+</header>
+<pre class="output-pane" id="ses-error-pane">No errors yet.</pre>
+</section>
+</div>
+</section>
     </section>
     </main><main class='tab-content dashboard-layout ' id='tab-upi' style='display:none;'>
     <header class="page-header">
       <div class="header-titles">
-        <span class="eyebrow">Cấp phát tài khoản</span>
+        <span class="eyebrow">Operations Desk</span>
         <h1>UPI issuance</h1>
         <p>Generate, monitor and recover QR payment jobs without leaving the active queue.</p>
       </div>
@@ -294,35 +527,187 @@
     <section class="workspace">
       <!-- LEFT COL: CONFIG -->
       <div class="left-col panel">
-        <div class="panel-header">Tài khoản nguồn</div>
-        
+        <aside class="control-rail">
+<section class="card card-input control-surface">
+<header class="card-head">
+<div class="panel-title-group">
+<h2 data-i18n="upi_identities">Payment identities</h2>
+<span class="panel-subtitle">Combo or API session JSON</span>
+</div>
+</header>
+<textarea class="combo-textarea" id="upi-combo-input" placeholder="email1@nik.edu.pl|GPT#xxx|TOTP_SECRET
+email2@nik.edu.pl|GPT#yyy|TOTP_SECRET"></textarea>
+<textarea class="combo-textarea upi-session-textarea" id="upi-session-input" placeholder='Hoặc dán API session JSON mới dòng 1 object từ https://chatgpt.com/api/auth/session
+{"user":{"email":"mail@example.com"},"accessToken":"eyJ...","expires":"..."}'></textarea>
+<div class="card-settings">
+<div class="card-settings-row card-settings-row-mixed">
+<label class="input-group config-field-short" title="Số luồng chạy song song">
+<span class="input-label" data-i18n="reg_reg_mode">Mode</span>
+<select class="concurrency-select" data-tab="upi" id="upi-concurrency-select">
+<option value="single">Single (1)</option>
+<option value="multi">Multi (2)</option>
+<option value="multi3">Multi (3)</option>
+<option value="multi5">Multi (5)</option>
+<option value="multi10">Multi (10)</option>
+<option value="multi20">Multi (20)</option>
+<option value="multi30">Multi (30)</option>
+<option value="multi50">Multi (50)</option>
+</select>
+</label>
+<label class="input-group config-field-short" title="Số lần retry POST /backend-api/payments/checkout/approve">
+<span class="input-label">Approve retries</span>
+<input id="upi-approve-retries" max="2000" min="1" step="1" type="number" value="500"/>
+</label>
+<label class="input-group config-field-short" title="Timeout cho mỗi job (giây)">
+<span class="input-label" data-i18n="reg_timeout">Timeout (s/job)</span>
+<input id="upi-job-timeout" max="7200" min="60" step="60" type="number" value="1800"/>
+</label>
+<label class="input-group config-field-short" title="Step bắt đầu áp proxy (1-6). 1 = login + checkout + stripe + approve via proxy (an toàn khi IP host non-IN). 3 = step 1-2 DIRECT, 3-6 via proxy (default — chỉ ổn nếu IP host hợp lệ).">
+<span class="input-label">Proxy from step</span>
+<select id="upi-proxy-from-step">
+<option value="1">1 — login + all (full proxy)</option>
+<option value="2">2 — checkout + later</option>
+<option selected="" value="3">3 — stripe_init + later</option>
+<option value="4">4 — elements + later</option>
+<option value="5">5 — confirm + approve</option>
+<option value="6">6 — approve only</option>
+</select>
+</label>
+<span aria-hidden="true" class="settings-divider"></span>
+<label class="toggle-wrap" id="upi-notify-wrap" title="Bật để gửi QR + thông tin account qua Telegram khi job xong">
+<input id="upi-notify-toggle" type="checkbox"/>
+<span class="toggle-track"><span class="toggle-thumb"></span></span>
+<span class="toggle-label" data-i18n="upi_telegram">Gửi Telegram</span>
+</label>
+</div>
+<div class="workflow-proxy-row">
+<div class="input-group workflow-proxy-field">
+<div class="workflow-proxy-heading">
+<label class="input-label" for="upi-proxy-input">UPI proxy <small>Only for UPI QR</small></label>
+<label class="toggle-wrap workflow-proxy-toggle" title="Use this proxy for UPI QR jobs">
+<input id="upi-proxy-toggle" type="checkbox"/>
+<span class="toggle-track"><span class="toggle-thumb"></span></span>
+<span class="toggle-label" data-i18n="reg_use_proxy">Use proxy</span>
+</label>
+</div>
+<textarea autocomplete="off" class="proxy-textarea" id="upi-proxy-input" placeholder="host:port:user:pass
+host2:port:user:pass (blank = direct)" rows="3" spellcheck="false"></textarea>
+</div>
+</div>
+</div>
+<div class="card-actions">
+<button class="btn btn-primary" data-i18n="upi_start" id="upi-btn-run">Get UPI QR</button>
+<button class="btn btn-danger" data-i18n="reg_stop" id="upi-btn-stop-all">Stop All</button>
+<button class="btn btn-ghost" data-i18n="reg_clear" id="upi-btn-clear-input">Clear Input</button>
+<span class="muted" data-i18n="reg_combos_count" id="upi-combo-count">0 combos</span>
+</div>
+</section>
+</aside>
       </div>
 
       <!-- CENTER COL: QUEUE -->
       <div class="center-col panel">
-        <div class="panel-header">
-          <div class="panel-title">Execution queue</div>
-        </div>
-        <div class="queue-container">
-          None
-        </div>
+        <section class="card card-jobs jobs-surface">
+<header class="card-head">
+<div class="panel-title-group">
+<h2 data-i18n="upi_queue_title">Payment queue</h2>
+<span class="panel-subtitle" data-i18n="upi_queue_desc">Checkout, approval and QR status</span>
+</div>
+<div class="card-head-actions">
+<button class="btn btn-ghost btn-small" data-i18n="upi_retry_expired" id="upi-btn-retry-expired-free" title="Retry mọi job có QR hết hạn nhưng vẫn Free">Retry Expired+Free</button>
+<button class="btn btn-ghost btn-small" data-i18n="reg_retry_failed" id="upi-btn-retry-failed" title="Retry all error &amp; cancelled jobs">Retry Failed</button>
+<button class="btn btn-ghost btn-small" data-i18n="reg_clear_done" id="upi-btn-clear-done">Clear Done</button>
+<button class="btn btn-ghost btn-small" data-i18n="reg_clear_all" id="upi-btn-clear-all" title="Xóa TẤT CẢ jobs (mọi trạng thái)">Clear All</button>
+<span class="muted" id="upi-job-summary">0 total</span>
+</div>
+</header>
+<div class="job-list" id="upi-job-list">
+<div class="empty" data-i18n="upi_no_jobs">Paste accounts and click Get UPI QR.</div>
+</div>
+</section>
       </div>
 
       <!-- RIGHT COL: LIVE OVERVIEW -->
       <div class="right-col panel">
-        <div class="panel-header">Live overview <span class="live-indicator">Live</span></div>
-        
+        <aside aria-label="UPI insights" class="insights-rail tab-chart-rail ops-live-rail">
+<section class="insight-card live-overview-card">
+<header class="live-overview-head">
+<span class="live-overview-title"><span aria-hidden="true" class="live-overview-icon"></span>Live Overview</span>
+<span class="live-badge">Live</span>
+</header>
+<div class="live-overview-stats">
+<div><strong id="upi-rail-success">0</strong><span>Success</span></div>
+<div><strong id="upi-chart-running">0</strong><span>Running</span></div>
+<div class="is-error"><strong id="upi-chart-errors">0</strong><span>Errors</span></div>
+</div>
+<div class="rail-chart-head">
+<strong>UPI Success</strong>
+<span>Last 30m</span>
+</div>
+<div aria-label="Realtime UPI success chart" class="live-chart ops-realtime-chart rail-live-chart" data-chart-value-id="upi-chart-value" id="upi-realtime-chart"></div>
+<div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
+<div class="rail-block health-card">
+<header class="rail-block-head">System Health</header>
+<div class="health-row"><span>Runtime</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Payments</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Proxies</span><strong>Healthy</strong></div>
+<div class="health-row"><span>API Endpoints</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Telegram</span><strong>Healthy</strong></div>
+</div>
+<div class="rail-block quick-card">
+<header class="rail-block-head">Quick Actions</header>
+<div class="quick-grid">
+<button class="btn btn-ghost btn-small" type="button">Export Success</button>
+<button class="btn btn-ghost btn-small" type="button">Export Errors</button>
+<button class="btn btn-ghost btn-small" type="button">View QR Output</button>
+<button class="btn btn-ghost btn-small" type="button">Webhook Logs</button>
+</div>
+</div>
+<span class="rail-hidden-metric" id="upi-chart-value">0%</span>
+</section>
+</aside>
       </div>
     </section>
 
     <!-- RUNTIME LOG -->
     <section class="runtime-log panel">
-      
+      <section class="diagnostics-dock is-collapsed" data-dock="upi">
+<header class="dock-bar">
+<div aria-label="UPI diagnostics" class="dock-tabs" role="tablist">
+<button aria-selected="true" class="dock-tab active" data-dock-target="upi-log" data-i18n="reg_tab_runtime" role="tab" type="button">Runtime</button>
+<button aria-selected="false" class="dock-tab" data-dock-target="upi-output" data-i18n="reg_tab_success" role="tab" type="button">Output</button>
+<button aria-selected="false" class="dock-tab" data-dock-target="upi-error" data-i18n="reg_tab_errors" role="tab" type="button">Errors</button>
+</div>
+<div class="dock-context">
+<span class="dock-target" id="upi-log-target">No job selected</span>
+<button aria-expanded="false" class="dock-collapse" data-dock-collapse="" data-i18n="show_details" type="button">Show details</button>
+</div>
+</header>
+<div class="dock-panels">
+<section class="dock-panel active card card-log" data-dock-panel="upi-log" role="tabpanel">
+<pre class="log-pane" id="upi-log-pane"></pre>
+</section>
+<section class="dock-panel card card-success" data-dock-panel="upi-output" hidden="" role="tabpanel">
+<header class="dock-panel-head">
+<span data-i18n="upi_output_head">Generated payment output</span>
+<button class="btn btn-ghost btn-small" data-i18n="copy_all" id="upi-btn-copy-success">Copy all</button>
+</header>
+<pre class="output-pane" id="upi-success-pane">Format: email|password|secret_2fa</pre>
+</section>
+<section class="dock-panel card card-error" data-dock-panel="upi-error" hidden="" role="tabpanel">
+<header class="dock-panel-head">
+<span data-i18n="upi_errors_head">Payment workflow failures</span>
+<button class="btn btn-ghost btn-small" data-i18n="copy_all" id="upi-btn-copy-error">Copy all</button>
+</header>
+<pre class="output-pane" id="upi-error-pane">No errors yet.</pre>
+</section>
+</div>
+</section>
     </section>
     </main><main class='tab-content dashboard-layout ' id='tab-getacc' style='display:none;'>
     <header class="page-header">
       <div class="header-titles">
-        <span class="eyebrow">Cấp phát tài khoản</span>
+        <span class="eyebrow">Operations Desk</span>
         <h1>Get Account</h1>
         <p>Paste a ChatGPT session JSON to extract the account's email, password, and 2FA secret.</p>
       </div>
@@ -338,24 +723,80 @@
     <section class="workspace">
       <!-- LEFT COL: CONFIG -->
       <div class="left-col panel">
-        <div class="panel-header">Tài khoản nguồn</div>
-        
+        <aside class="control-rail">
+<section class="card card-input control-surface">
+<header class="card-head">
+<div class="panel-title-group">
+<h2 data-i18n="acc_json">JSON Payload</h2>
+<span class="panel-subtitle">Session or Reg JSON</span>
+</div>
+</header>
+<textarea class="combo-textarea" id="getacc-json-input" placeholder='{"WARNING_BANNER": "...", "user": {"email": "..."}}'></textarea>
+<div class="card-actions">
+<button class="btn btn-primary" data-i18n="acc_start" id="getacc-extract-btn" style="width: 100%;">Extract Credentials</button>
+</div>
+</section>
+</aside>
       </div>
 
       <!-- CENTER COL: QUEUE -->
       <div class="center-col panel">
-        <div class="panel-header">
-          <div class="panel-title">Execution queue</div>
-        </div>
-        <div class="queue-container">
-          None
-        </div>
+        <section class="card card-jobs jobs-surface">
+<header class="card-head">
+<div class="panel-title-group">
+<h2 data-i18n="acc_queue_title">Extraction queue</h2>
+<span class="panel-subtitle" data-i18n="acc_queue_desc">Extracted cookies &amp; credentials</span>
+</div>
+<div class="card-head-actions">
+<button class="btn btn-ghost btn-small" data-i18n="reg_clear_all" id="getacc-btn-clear-all" title="Remove all items">Clear All</button>
+<span class="muted" id="getacc-job-summary">0 total</span>
+</div>
+</header>
+<div class="job-list" id="getacc-job-list">
+<div class="empty" data-i18n="acc_no_jobs">No data yet. Paste JSON into the input box to begin.</div>
+</div>
+</section>
       </div>
 
       <!-- RIGHT COL: LIVE OVERVIEW -->
       <div class="right-col panel">
-        <div class="panel-header">Live overview <span class="live-indicator">Live</span></div>
-        
+        <aside aria-label="Get Account insights" class="insights-rail tab-chart-rail ops-live-rail">
+<section class="insight-card live-overview-card">
+<header class="live-overview-head">
+<span class="live-overview-title"><span aria-hidden="true" class="live-overview-icon"></span>Live Overview</span>
+<span class="live-badge">Live</span>
+</header>
+<div class="live-overview-stats">
+<div><strong id="getacc-rail-success">0</strong><span>Success</span></div>
+<div><strong id="getacc-chart-total">0</strong><span>Extracted</span></div>
+<div class="is-error"><strong id="getacc-chart-errors">0</strong><span>Failed</span></div>
+</div>
+<div class="rail-chart-head">
+<strong>Extraction Success</strong>
+<span>Last 30m</span>
+</div>
+<div aria-label="Realtime extraction chart" class="live-chart ops-realtime-chart rail-live-chart" data-chart-value-id="getacc-chart-value" id="getacc-realtime-chart"></div>
+<div class="rail-chart-foot"><span>09:54</span><span>10:04</span><span>10:14</span><span>10:24</span></div>
+<div class="rail-block health-card">
+<header class="rail-block-head">System Health</header>
+<div class="health-row"><span>Runtime</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Parser</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Credential API</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Clipboard</span><strong>Healthy</strong></div>
+<div class="health-row"><span>Storage</span><strong>Healthy</strong></div>
+</div>
+<div class="rail-block quick-card">
+<header class="rail-block-head">Quick Actions</header>
+<div class="quick-grid">
+<button class="btn btn-ghost btn-small" type="button">Export Success</button>
+<button class="btn btn-ghost btn-small" type="button">Export Errors</button>
+<button class="btn btn-ghost btn-small" type="button">View Output</button>
+<button class="btn btn-ghost btn-small" type="button">Webhook Logs</button>
+</div>
+</div>
+<span class="rail-hidden-metric" id="getacc-chart-value">0%</span>
+</section>
+</aside>
       </div>
     </section>
 
@@ -615,6 +1056,7 @@ http://user2:pass2@host2:port2" spellcheck="false"></textarea>
 </footer>
 </div>
 </div>
+<div style="display:none;" id="global-toggles-hidden"></div>
 <script>
   (() => {
     try {
@@ -624,18 +1066,6 @@ http://user2:pass2@host2:port2" spellcheck="false"></textarea>
       document.body.classList.add('dark-theme');
     }
   })();
-</script>
-<script src="./dialog.js?v=__ASSET_VERSION__"></script>
-<script src="./settings.js?v=__ASSET_VERSION__"></script>
-<script src="./app.js?v=__ASSET_VERSION__"></script>
-<script src="./session.js?v=__ASSET_VERSION__"></script>
-<script src="./link.js?v=__ASSET_VERSION__"></script>
-<script src="./hme.js?v=__ASSET_VERSION__"></script>
-<script src="./autoreg.js?v=__ASSET_VERSION__"></script>
-<script src="./upi.js?v=__ASSET_VERSION__"></script>
-<script src="./settings_panel.js?v=__ASSET_VERSION__"></script>
-<script src="./workspace.js?v=__ASSET_VERSION__"></script>
-<script src="./getacc.js?v=__ASSET_VERSION__"></script>
-<script src="./mac_select.js?v=__ASSET_VERSION__"></script>
+</script><script src="./dialog.js?v=__ASSET_VERSION__"></script><script src="./settings.js?v=__ASSET_VERSION__"></script><script src="./app.js?v=__ASSET_VERSION__"></script><script src="./session.js?v=__ASSET_VERSION__"></script><script src="./link.js?v=__ASSET_VERSION__"></script><script src="./hme.js?v=__ASSET_VERSION__"></script><script src="./autoreg.js?v=__ASSET_VERSION__"></script><script src="./upi.js?v=__ASSET_VERSION__"></script><script src="./settings_panel.js?v=__ASSET_VERSION__"></script><script src="./workspace.js?v=__ASSET_VERSION__"></script><script src="./getacc.js?v=__ASSET_VERSION__"></script><script src="./mac_select.js?v=__ASSET_VERSION__"></script>
 </body>
 </html>
