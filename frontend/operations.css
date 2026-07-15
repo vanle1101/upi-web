@@ -4134,7 +4134,7 @@ body.dark-theme {
 }
 
 .ops-live-rail .rail-live-chart {
-  height: 92px !important;
+  flex: 1 !important;
   min-height: 92px !important;
   margin: 0 !important;
   padding: 8px 0 0;
