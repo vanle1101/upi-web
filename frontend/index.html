@@ -50,8 +50,8 @@
 </div>
 
 <!-- ════════════════ TAB: REG ════════════════ -->
-<div class="app-container">
-  <aside class="app-sidebar">
+<div class="app-shell">
+  <aside class="sidebar">
     <div class="sidebar-logo">
       <svg viewBox="0 0 32 32" role="img" aria-hidden="true" style="width:24px;height:24px;margin-right:12px;">
           <defs>
@@ -124,7 +124,7 @@
       </div>
     </div>
   </aside>
-  <div class="app-main-content">
+  <div class="main">
     <header class="app-header">
       <div class="header-toggles">
         <label class="toggle-switch"><span class="toggle-label">Runtime</span><input type="checkbox" id="global-runtime-toggle" checked><span class="toggle-slider"></span></label>
@@ -133,7 +133,8 @@
       </div>
     </header>
 <main class="tab-content ops-workspace ops-reg active" id="tab-reg">
-  <div class="workspace-content">
+  <div class="dashboard-content">
+    <div class="dashboard-layout">
     <div class="page-header">
       <div class="page-title-wrap">
         <span class="page-category">Cấp phát tài khoản</span>
@@ -196,7 +197,7 @@
       </div>
     </div>
     
-    <div class="main-grid">
+    <div class="workspace">
       <div class="form-panel">
         <div class="panel-block">
           <div class="panel-header">
@@ -251,7 +252,7 @@
         </div>
       </div>
 
-      <div class="queue-panel">
+      <div class="queue-card">
         <div class="queue-header">
           <div>
             <span class="queue-title">Execution queue</span>
@@ -278,29 +279,12 @@
           <div>UPDATED</div>
           <div>ACTIONS</div>
         </div>
-        <div class="queue-table-body" id="job-list">
+        <div class="queue-table-body queue-list" id="job-list">
           <div class="queue-empty-state" id="job-list-empty">Chưa có job. Dán combo và bấm Start registration.</div>
         </div>
       </div>
 
-      <div class="log-panel">
-        <div class="log-header">
-          <div class="log-tabs">
-            <div class="log-tab active" data-target="log-pane">Runtime</div>
-            <div class="log-tab" data-target="success-pane">Success</div>
-            <div class="log-tab" data-target="error-pane">Errors</div>
-          </div>
-          <div class="log-controls">
-            <label class="toggle-switch" style="transform:scale(0.8);transform-origin:right center;"><span class="toggle-label" style="color:var(--lt-text-muted);">Auto scroll</span><input type="checkbox" checked><span class="toggle-slider"></span></label>
-            <button id="btn-clear-log" class="btn-ghost" style="padding:4px 12px;">Clear log</button>
-          </div>
-        </div>
-        <div class="log-body">
-          <pre id="log-pane" style="margin:0;font-family:inherit;"></pre>
-          <pre id="success-pane" style="margin:0;font-family:inherit;display:none;"></pre>
-          <pre id="error-pane" style="margin:0;font-family:inherit;display:none;"></pre>
-        </div>
-      </div>
+      
       
       <aside class="insights-rail ops-live-rail" aria-label="Registration insights">
       <section class="insight-card live-overview-card">
@@ -335,12 +319,43 @@
     </aside>
 
     </div>
+            <section class="diagnostics-dock is-collapsed runtime-log" data-dock="reg">
+        <header class="dock-bar">
+          <div class="dock-tabs" role="tablist" aria-label="Registration diagnostics">
+            <button class="dock-tab active" type="button" role="tab" aria-selected="true" data-dock-target="reg-log" data-i18n="reg_tab_runtime">Runtime</button>
+            <button class="dock-tab" type="button" role="tab" aria-selected="false" data-dock-target="reg-success" data-i18n="reg_tab_success">Success</button>
+            <button class="dock-tab" type="button" role="tab" aria-selected="false" data-dock-target="reg-error" data-i18n="reg_tab_errors">Errors</button>
+          </div>
+          <div class="dock-context">
+            <span class="dock-target" id="log-target">No job selected</span>
+            <button id="btn-clear-log" class="btn btn-ghost btn-small" data-i18n="clear_log" title="Clear log viewer">Clear log</button>
+            <button class="dock-collapse" type="button" data-dock-collapse data-i18n="show_details" aria-expanded="false">Show details</button>
+          </div>
+        </header>
+        <div class="dock-panels runtime-log-content">
+          <section class="dock-panel active card card-log" role="tabpanel" data-dock-panel="reg-log">
+            <pre id="log-pane" class="log-pane"></pre>
+          </section>
+          <section class="dock-panel card card-success" role="tabpanel" data-dock-panel="reg-success" hidden>
+            <header class="dock-panel-head">
+              <span data-i18n="reg_success_head">Completed account output</span>
+              <button id="btn-copy-success" class="btn btn-ghost btn-small" data-i18n="copy_all">Copy all</button>
+            </header>
+            <pre id="success-pane" class="output-pane">Format: email|password|secret_2fa</pre>
+          </section>
+          <section class="dock-panel card card-error" role="tabpanel" data-dock-panel="reg-error" hidden>
+            <header class="dock-panel-head">
+              <span data-i18n="reg_error_head">Failed account output</span>
+              <button id="btn-copy-error" class="btn btn-ghost btn-small" data-i18n="copy_all">Copy all</button>
+            </header>
+            <pre id="error-pane" class="output-pane">No errors yet.</pre>
+          </section>
+        </div>
+      </section>
+    </div>
   </div>
 </main>
 <!-- ------------------ TAB: GET SESSION ------------------ -->
-
-  </div>
-</main>
 
 <!-- ════════════════ TAB: GET SESSION ════════════════ -->
 <main class="tab-content ops-workspace ops-session" id="tab-session">
