@@ -29,6 +29,7 @@
     return new OriginalEventSource(url, config);
   };
 </script>
+  <link rel="stylesheet" href="/layout-theme.css" />
 </head>
 <body>
 <script>
@@ -41,85 +42,96 @@
     }
   })();
 </script>
-<a class="skip-link" href="#tab-reg">Skip to workspace</a>
-<header class="topbar">
-  <div class="mac-traffic-lights">
-    <span class="mac-btn close"></span>
-    <span class="mac-btn minimize"></span>
-    <span class="mac-btn maximize"></span>
-  </div>
-  <div class="brand">
-    <span class="brand-mark" aria-hidden="true">
-      <svg class="brand-logo" viewBox="0 0 32 32" role="img" aria-hidden="true">
-        <defs>
-          <linearGradient id="brandCubeTop" x1="8" y1="5" x2="24" y2="16" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#9AF7C4" />
-            <stop offset="1" stop-color="#38D996" />
-          </linearGradient>
-          <linearGradient id="brandCubeLeft" x1="6" y1="10" x2="16" y2="27" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#4EE6B1" />
-            <stop offset="1" stop-color="#1B8D72" />
-          </linearGradient>
-          <linearGradient id="brandCubeRight" x1="16" y1="10" x2="26" y2="27" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stop-color="#62B7FF" />
-            <stop offset="1" stop-color="#2866E8" />
-          </linearGradient>
-        </defs>
-        <path d="M16 3.8 27 10.1v12.7L16 29.2 5 22.8V10.1L16 3.8Z" fill="#07131C" stroke="rgba(190,255,226,.55)" stroke-width="1.15" />
-        <path d="M16 5.9 25 11.1 16 16.2 7 11.1 16 5.9Z" fill="url(#brandCubeTop)" />
-        <path d="M7 11.1 16 16.2v10.3L7 21.3V11.1Z" fill="url(#brandCubeLeft)" />
-        <path d="M25 11.1 16 16.2v10.3l9-5.2V11.1Z" fill="url(#brandCubeRight)" />
-        <path d="M16 16.2 16 26.5" stroke="rgba(255,255,255,.36)" stroke-width="1" />
-      </svg>
-    </span>
-    <span class="brand-copy">
-      <span class="brand-name">@lhv_myhanh</span>
-      <span class="brand-tag" data-i18n="brand_tag">Operations Console</span>
-    </span>
-  </div>
-  <nav class="tab-nav">
-    <button class="tab-btn active" data-tab="reg" aria-label="Reg" data-i18n="reg">
-      <span class="tab-glyph" aria-hidden="true"></span>
-      <span class="tab-copy"><strong>Reg</strong><small>Provision accounts</small></span>
-    </button>
-    <button class="tab-btn" data-tab="session" aria-label="Get Session" data-i18n="session">
-      <span class="tab-glyph" aria-hidden="true"></span>
-      <span class="tab-copy"><strong>Get Session</strong><small>Capture auth state</small></span>
-    </button>
-    <button class="tab-btn" data-tab="upi" aria-label="UPI QR" data-i18n="upi">
-      <span class="tab-glyph" aria-hidden="true"></span>
-      <span class="tab-copy"><strong>UPI QR</strong><small>Payment issuance</small></span>
-    </button>
-    <button class="tab-btn" data-tab="getacc" aria-label="Get Acc" data-i18n="getacc">
-      <span class="tab-glyph" aria-hidden="true"></span>
-      <span class="tab-copy"><strong>Get Acc</strong><small>Extract credentials</small></span>
-    </button>
-    <button class="tab-btn" data-tab="settings" aria-label="Settings" data-i18n="settings">
-      <span class="tab-glyph" aria-hidden="true"></span>
-      <span class="tab-copy"><strong>Settings</strong><small>Runtime controls</small></span>
-    </button>
-  </nav>
-  <div class="topbar-actions">
-    <span class="rail-section-label" data-i18n="runtime_section">Runtime</span>
-    <label class="toggle-wrap" data-i18n-title="headless_title" title="Bật để ẩn cửa sổ trình duyệt khi chạy">
-      <input type="checkbox" id="headless-toggle" checked />
-      <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      <span class="toggle-label" data-i18n="runtime_label">Headless</span>
-    </label>
 
-    <label class="toggle-wrap" data-i18n-title="debug_title" title="Giữ browser mở sau khi job xong (chỉ khi headed)">
-      <input type="checkbox" id="debug-toggle" />
-      <span class="toggle-track"><span class="toggle-thumb"></span></span>
-      <span class="toggle-label" data-i18n="debug_label">Debug</span>
-    </label>
-  </div>
-</header>
+
 <div class="sidebar-footer-controls">
   <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Theme"></button>
   <button id="lang-toggle-btn" class="lang-toggle-btn" aria-label="Toggle Language" title="Toggle Language">EN</button>
 </div>
 
 <!-- ════════════════ TAB: REG ════════════════ -->
+<div class="app-container">
+  <aside class="app-sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 32 32" role="img" aria-hidden="true" style="width:24px;height:24px;margin-right:12px;">
+          <defs>
+            <linearGradient id="brandCubeTop2" x1="8" y1="5" x2="24" y2="16" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9AF7C4" /><stop offset="1" stop-color="#38D996" /></linearGradient>
+            <linearGradient id="brandCubeLeft2" x1="6" y1="10" x2="16" y2="27" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4EE6B1" /><stop offset="1" stop-color="#1B8D72" /></linearGradient>
+            <linearGradient id="brandCubeRight2" x1="16" y1="10" x2="26" y2="27" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#62B7FF" /><stop offset="1" stop-color="#2866E8" /></linearGradient>
+          </defs>
+          <path d="M16 3.8 27 10.1v12.7L16 29.2 5 22.8V10.1L16 3.8Z" fill="#07131C" stroke="rgba(190,255,226,.55)" stroke-width="1.15" />
+          <path d="M16 5.9 25 11.1 16 16.2 7 11.1 16 5.9Z" fill="url(#brandCubeTop2)" />
+          <path d="M7 11.1 16 16.2v10.3L7 21.3V11.1Z" fill="url(#brandCubeLeft2)" />
+          <path d="M25 11.1 16 16.2v10.3l9-5.2V11.1Z" fill="url(#brandCubeRight2)" />
+      </svg>
+      <div class="sidebar-logo-text">
+        <span class="sidebar-logo-title">@lhv_myhanh</span>
+        <span class="sidebar-logo-subtitle">Operations Desk</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+    <button class="sidebar-nav-item tab-btn active" data-tab="reg" aria-label="Reg">
+      <span class="sidebar-nav-icon"></span>
+      <span class="sidebar-nav-text">
+        <span class="sidebar-nav-title">Reg</span>
+        <span class="sidebar-nav-subtitle">Provision accounts</span>
+      </span>
+    </button>
+    <button class="sidebar-nav-item tab-btn" data-tab="session" aria-label="Get Session">
+      <span class="sidebar-nav-icon"></span>
+      <span class="sidebar-nav-text">
+        <span class="sidebar-nav-title">Get Session</span>
+        <span class="sidebar-nav-subtitle">Capture auth state</span>
+      </span>
+    </button>
+    <button class="sidebar-nav-item tab-btn" data-tab="upi" aria-label="UPI QR">
+      <span class="sidebar-nav-icon"></span>
+      <span class="sidebar-nav-text">
+        <span class="sidebar-nav-title">UPI QR</span>
+        <span class="sidebar-nav-subtitle">Payment issuance</span>
+      </span>
+    </button>
+    <button class="sidebar-nav-item tab-btn" data-tab="getacc" aria-label="Get Acc">
+      <span class="sidebar-nav-icon"></span>
+      <span class="sidebar-nav-text">
+        <span class="sidebar-nav-title">Get Acc</span>
+        <span class="sidebar-nav-subtitle">Extract credentials</span>
+      </span>
+    </button>
+    <button class="sidebar-nav-item tab-btn" data-tab="settings" aria-label="Settings">
+      <span class="sidebar-nav-icon"></span>
+      <span class="sidebar-nav-text">
+        <span class="sidebar-nav-title">Settings</span>
+        <span class="sidebar-nav-subtitle">Runtime controls</span>
+      </span>
+    </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="sidebar-status">System Online</div>
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">AD</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name">Admin User</span>
+          <span class="sidebar-user-role">admin@gsh.io</span>
+        </div>
+        <svg class="sidebar-user-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <div class="sidebar-controls">
+        <button class="sidebar-control-btn" id="theme-toggle-btn" aria-label="Toggle dark mode">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="sidebar-control-btn" id="lang-toggle-btn" aria-label="Toggle language">EN</button>
+      </div>
+    </div>
+  </aside>
+  <div class="app-main-content">
+    <header class="app-header">
+      <div class="header-toggles">
+        <label class="toggle-switch"><span class="toggle-label">Runtime</span><input type="checkbox" id="global-runtime-toggle" checked><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><span class="toggle-label">Headless</span><input type="checkbox" id="global-headless-toggle" checked><span class="toggle-slider"></span></label>
+        <label class="toggle-switch"><span class="toggle-label">Debug</span><input type="checkbox" id="global-debug-toggle"><span class="toggle-slider"></span></label>
+      </div>
+    </header>
 <main class="tab-content ops-workspace ops-reg active" id="tab-reg">
   <header class="workspace-mast">
     <div class="workspace-title-group">
@@ -232,28 +244,39 @@
   </section>
     </aside>
 
-    <section class="execution-canvas">
-  <section class="card card-jobs jobs-surface">
-    <header class="card-head">
-      <div class="panel-title-group">
-        <h2 data-i18n="reg_queue_title">Execution queue</h2>
-        <span class="panel-subtitle" data-i18n="reg_queue_desc">Live registration activity</span>
+    
+      <div class="queue-panel">
+        <div class="queue-header">
+          <div>
+            <span class="queue-title">Execution queue</span>
+            <span class="queue-subtitle">Hoạt động đăng ký tài khoản trực tiếp.</span>
+          </div>
+          <div class="queue-controls">
+            <div class="form-group" style="flex-direction:row;align-items:center;gap:8px;">
+              <label class="form-label" style="margin:0;">Retry</label>
+              <input type="number" id="auto-retry-max" value="0" class="form-input">
+            </div>
+            <button id="btn-retry-failed" class="btn-ghost">Retry Failed</button>
+            <button id="btn-clear-done" class="btn-ghost">Clear completed</button>
+            <button id="btn-clear-all" class="btn-ghost">Clear All</button>
+            <span class="queue-subtitle" id="job-summary" style="margin:0;margin-left:8px;"><span style="color:var(--lt-green)">● 28 đang chạy</span></span>
+          </div>
+        </div>
+        <div class="queue-table-head">
+          <div>#</div>
+          <div>STATUS</div>
+          <div>ACCOUNT</div>
+          <div>SOURCE</div>
+          <div>DURATION</div>
+          <div>PROGRESS</div>
+          <div>UPDATED</div>
+          <div>ACTIONS</div>
+        </div>
+        <div class="queue-table-body" id="job-list">
+          <div class="queue-empty-state" id="job-list-empty">Chưa có job. Dán combo và bấm Start registration.</div>
+        </div>
       </div>
-      <div class="card-head-actions">
-        <label class="input-group config-field-tiny" title="Số lần retry khi job bị error (0 = không retry)">
-          <span class="input-label">Retry</span>
-          <input type="number" id="auto-retry-max" value="0" min="0" max="10" step="1" />
-        </label>
-        <button id="btn-retry-failed" class="btn btn-ghost btn-small" data-i18n="reg_retry_failed" title="Retry all error & cancelled jobs">Retry Failed</button>
-        <button id="btn-clear-done" class="btn btn-ghost btn-small" data-i18n="reg_clear_done" title="Remove finished jobs from memory">Clear Done</button>
-        <button id="btn-clear-all" class="btn btn-ghost btn-small" data-i18n="reg_clear_all" title="Remove ALL jobs (all statuses)">Clear All</button>
-        <span class="muted" id="job-summary">0 total</span>
-      </div>
-    </header>
-    <div id="job-list" class="job-list">
-      <div class="empty" data-i18n="reg_no_jobs">No jobs yet. Paste combos and click Run.</div>
-    </div>
-  </section>
+
 
       <section class="diagnostics-dock is-collapsed" data-dock="reg">
         <header class="dock-bar">
@@ -321,6 +344,9 @@
         <span class="rail-hidden-metric" id="insight-error-rate">0%</span>
       </section>
     </aside>
+    </div>
+  </div>
+
   </div>
 </main>
 
@@ -837,9 +863,7 @@
         <div id="telegram-status" class="proxy-pool-status muted"></div>
       </div>
     </section>
-  </div>
-  </div>
-</main>
+  </main>
 
 <!-- Bulk-paste proxy dialog -->
 <div id="proxy-paste-modal" class="modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="proxy-paste-title">
@@ -1028,4 +1052,6 @@
 <script src="/getacc.js?v=__ASSET_VERSION__"></script>
 <script src="/mac_select.js?v=__ASSET_VERSION__"></script>
 </body>
-</html>
+</html>  </div>
+</div>
+
