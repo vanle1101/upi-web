@@ -39,5 +39,5 @@ if errorlevel 1 (
 
 echo Dang khoi dong Server...
 timeout /t 3
-python -m uvicorn web.server:app --host 0.0.0.0 --port 8083
+".venv\Scripts\python.exe" -m uvicorn web.server:app --host 0.0.0.0 --port 8083
 pause
